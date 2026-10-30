@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0b0918">
+<title>GIF maker · The Order of 86</title>
+<meta name="description" content="The Order of 86: the wizard-hat dogs who keep the seven moons of Pawtheon.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/anybody-expanded-black.woff" as="font" type="font/woff" crossorigin>
+<link rel="stylesheet" href="css/style.css?v=9">
+</head>
+<body class="page-gifs">
+<a class="skip" href="#main">Skip to content</a>
+<div class="sky" aria-hidden="true"><div class="stars"></div><div class="glow glow-a"></div><div class="glow glow-b"></div></div>
+<header class="site-header">
+  <nav class="site-nav wrap" aria-label="Main">
+    <a class="brand" href="index.html"><svg class="logo" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9c4ff"/><stop offset="1" stop-color="#8f63ff"/></linearGradient></defs><path d="M33 5 L47 45 H17 Z" fill="url(#lg)"/><path d="M33 5 Q41 9 44 3" fill="none" stroke="#d9c4ff" stroke-width="3" stroke-linecap="round"/><rect x="10" y="44" width="44" height="7" rx="3.5" fill="#f6d47c"/><circle cx="32" cy="29" r="3.6" fill="#f6d47c"/><circle cx="26" cy="20" r="1.8" fill="#fff" opacity=".8"/></svg><span>The Order <b>of 86</b></span></a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span class="sr-only">Menu</span></button>
+    <ul class="nav-links" id="nav-links"><li><a href="index.html">Home</a></li><li><a href="index.html#wizards">Wizards</a></li><li><a href="lore.html">Lore</a></li><li><a href="pawtheon.html">Pawtheon</a></li><li><a href="banner.html">Banner maker</a></li><li><a href="gifs.html" aria-current="page">GIF maker</a></li></ul>
+  </nav>
+</header>
+<main id="main" tabindex="-1">
+<section class="page-hero wrap page-hero-tight">
+  <p class="eyebrow">GIF maker</p>
+  <h1 class="display display-sm">Your wizard, in motion</h1>
+  <p class="lead">Pick your wizard and every GIF below is redrawn with your dog, hat and all. Tap one to watch it, then download it. The GIFs are built in your browser, and nothing gets uploaded.</p>
+</section>
+<div class="wrap gm-studio">
+  <section class="panel gm-controls" aria-label="Choose your wizard">
+    <div class="gm-chosen" id="gm-chosen">
+      <img id="gm-chosen-img" src="images/dogs/6164.png" alt="" width="96" height="96">
+      <div><p class="eyebrow">Your wizard</p><p class="gm-chosen-name" id="gm-chosen-name">The Wanderer</p><p class="muted small" id="gm-chosen-num">#6164</p></div>
+    </div>
+    <div class="field field-search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <label for="gm-search" class="sr-only">Search by dog number or starter hat colour</label>
+      <input id="gm-search" type="search" placeholder="Dog number (6164) or hat colour (purple)" autocomplete="off" spellcheck="false">
+    </div>
+    <p class="muted small gm-count" id="gm-count" aria-live="polite"></p>
+    <div class="gm-results" id="gm-results" role="group" aria-label="Wizards"></div>
+    <fieldset class="ctl gm-bg">
+      <legend>Background</legend>
+      <div class="seg">
+        <label class="seg-opt"><input type="radio" name="gm-bg" value="dog" checked><span><i id="gm-bg-swatch"></i>My dog&rsquo;s background</span></label>
+        <label class="seg-opt"><input type="radio" name="gm-bg" value="tan"><span><i style="background:#f8e49e"></i>Tan</span></label>
+      </div>
+    </fieldset>
+  </section>
+  <section class="gm-gallery" aria-labelledby="gm-h">
+    <h2 id="gm-h" class="h3">GIFs</h2>
+    <ul class="grid gm-grid" id="gm-grid"><li class="muted">Loading the GIFs&hellip;</li></ul>
+    <p class="muted small gm-credit">Scenes from the <a href="https://doginaldogs.com/graphics-library" rel="noopener" target="_blank">Doginal Dogs graphics library</a>, reskinned for non-commercial community use. Wizard art from the Doginal Dogs collection.</p>
+  </section>
+</div>
+<dialog class="gm-dialog" id="gm-dialog" aria-labelledby="gm-d-title">
+  <div class="gm-d-inner panel">
+    <div class="gm-d-head"><h2 class="h3" id="gm-d-title">Preview</h2><button class="btn btn-ghost btn-sm" id="gm-close" type="button" aria-label="Close preview">Close</button></div>
+    <canvas id="gm-canvas" width="540" height="540" role="img" aria-label="GIF preview"></canvas>
+    <div class="gm-d-actions">
+      <button id="gm-download" class="btn btn-primary" type="button" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0l-4.5-4.5M12 15l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Download GIF</button>
+      <span class="muted small" id="gm-d-status" aria-live="polite"></span>
+    </div>
+  </div>
+</dialog>
+</main>
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <a class="brand brand-sm" href="index.html"><svg class="logo" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><defs><linearGradient id="lg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9c4ff"/><stop offset="1" stop-color="#8f63ff"/></linearGradient></defs><path d="M33 5 L47 45 H17 Z" fill="url(#lg2)"/><path d="M33 5 Q41 9 44 3" fill="none" stroke="#d9c4ff" stroke-width="3" stroke-linecap="round"/><rect x="10" y="44" width="44" height="7" rx="3.5" fill="#f6d47c"/><circle cx="32" cy="29" r="3.6" fill="#f6d47c"/><circle cx="26" cy="20" r="1.8" fill="#fff" opacity=".8"/></svg><span>The Order <b>of 86</b></span></a>
+    <div class="moons-mini" aria-hidden="true"><span style="--c:#ff7a45"></span><span style="--c:#ffd65a"></span><span style="--c:#3fb5ff"></span><span style="--c:#5fe08a"></span><span style="--c:#a46bff"></span><span style="--c:#ff8fc8"></span><span style="--c:#dfe3ea"></span></div>
+    <p>Keepers of the seven moons. Wizard dog art from the Doginal Dogs collection.</p>
+  </div>
+</footer>
+<script src="js/wizards.js?v=9" defer></script>
+<script src="js/site.js?v=9" defer></script>
+<script src="js/gifenc.js?v=9" defer></script>
+<script src="js/gifmaker.js?v=9" defer></script>
+</body>
+</html>

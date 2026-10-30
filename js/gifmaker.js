@@ -1,0 +1,215 @@
+/* Order of 86 GIF maker: reskins Doginal Dogs graphics-library GIFs with a chosen wizard, entirely in the browser.
+ * Each scene ships dog-free "plates" (the original frames with the old dog removed and the scene rebuilt behind it)
+ * plus per-frame cell ops; the wizard's official 25x25 portrait is pasted cell by cell, hat always on top,
+ * then the frames are encoded with js/gifenc.js. Nothing is uploaded. */
+(function () {
+  "use strict";
+  var BASE = "gifs/", V = "9";
+  var $ = function (s, el) { return (el || document).querySelector(s); };
+  var state = { dog: null, mode: "dog", index: [], dogs: {}, scenes: {}, open: null, timer: 0, token: 0 };
+
+  function json(u) { return fetch(BASE + u + "?v=" + V).then(function (r) { if (!r.ok) throw new Error(u); return r.json(); }); }
+  function hex(h) { return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]; }
+  function img(u) {
+    return new Promise(function (ok, bad) { var i = new Image(); i.onload = function () { ok(i); }; i.onerror = bad; i.src = BASE + u + "?v=" + V; });
+  }
+  function loadScene(id) {
+    if (state.scenes[id]) return state.scenes[id];
+    state.scenes[id] = json(id + "/scene.json").then(function (J) {
+      var jobs = []; for (var k = 0; k < J.np; k++) jobs.push(img(id + "/p" + k + ".png"));
+      return Promise.all(jobs).then(function (ims) {
+        var c = document.createElement("canvas"); c.width = J.w; c.height = J.h;
+        var x = c.getContext("2d", { willReadFrequently: true });
+        J.plates = ims.map(function (im) { x.clearRect(0, 0, J.w, J.h); x.drawImage(im, 0, 0); return x.getImageData(0, 0, J.w, J.h).data; });
+        return J;
+      });
+    });
+    return state.scenes[id];
+  }
+  /* background family -> the wizard's PFP background, keeping each shade's lightness (same rule as the build) */
+  function bgMap(J, dog) {
+    var T = hex(dog.bg), M = new Map();
+    Object.keys(J.fam).forEach(function (h) {
+      var m = J.fam[h], k = m[1], out;
+      if (m[0] === 0) out = T.map(function (t) { return Math.round(t * k); });
+      else if (m[0] === 1) out = T.map(function (t) { return Math.round(t + (255 - t) * k); });
+      else { var X = hex(m[2]); out = T.map(function (t, i) { return Math.round(t * (1 - k) + X[i] * k); }); }
+      M.set(parseInt(h, 16), out);
+    });
+    return M;
+  }
+  function compose(J, dog, mode, f) {
+    var fr = J.frames[f], src = J.plates[fr.p], d = new Uint8ClampedArray(src), W = J.w;
+    if (mode === "dog") {
+      var M = bgMap(J, dog), last = -1, hit = null;
+      for (var i = 0; i < d.length; i += 4) {
+        var c = (d[i] << 16) | (d[i + 1] << 8) | d[i + 2];
+        if (c !== last) { last = c; hit = M.get(c) || null; }
+        if (hit) { d[i] = hit[0]; d[i + 1] = hit[1]; d[i + 2] = hit[2]; }
+      }
+    }
+    var pal = dog._pal || (dog._pal = dog.pal.map(hex)), roles = dog._roles || (dog._roles = dog.roles.map(hex));
+    var g = dog.g[fr.st], ops = fr.ops, xs = J.xs, ys = J.ys;
+    for (var o = 0; o < ops.length; o += 6) {
+      var r = ops[o], cc = ops[o + 1], kind = ops[o + 2], col;
+      if (kind === 2) col = roles[ops[o + 5]];
+      else if (kind >= 5) {
+        // body texture: the dog's own torso / fur pixel (outline black; base fur keeps the scene's shading role)
+        var ro = ops[o + 5];
+        if (ro === 4) col = roles[4];
+        else {
+          var ti = (kind === 5 ? dog.tb : dog.tf).charCodeAt(ops[o + 3] * 25 + ops[o + 4]) - 48;
+          if (ti === 0) col = roles[ro];
+          else { col = pal[ti]; if (col[0] === roles[0][0] && col[1] === roles[0][1] && col[2] === roles[0][2]) col = roles[ro]; }
+        }
+      }
+      else {
+        var pi = g.charCodeAt(ops[o + 3] * 25 + ops[o + 4]) - 48;
+        if (pi === 0) { if (kind === 1) col = roles[ops[o + 5]]; else continue; }
+        else col = pal[pi];
+      }
+      for (var y = ys[r]; y < ys[r + 1]; y++) {
+        var p = (y * W + xs[cc]) * 4;
+        for (var x = xs[cc]; x < xs[cc + 1]; x++, p += 4) { d[p] = col[0]; d[p + 1] = col[1]; d[p + 2] = col[2]; d[p + 3] = 255; }
+      }
+    }
+    return d;
+  }
+  function paint(canvas, J, data) {
+    var big = document.createElement("canvas"); big.width = J.w; big.height = J.h;
+    big.getContext("2d").putImageData(new ImageData(data, J.w, J.h), 0, 0);
+    var x = canvas.getContext("2d"); x.imageSmoothingEnabled = false;
+    x.clearRect(0, 0, canvas.width, canvas.height); x.drawImage(big, 0, 0, canvas.width, canvas.height);
+  }
+  function wizardName0(w) { return w.starter ? w.name : (window.wizardName ? window.wizardName(w) : "Dog #" + w.number); }
+  /* everyone the picker offers: the 9 starter wizards first, then the Order's 86 */
+  function people() {
+    if (state.people) return state.people;
+    var st = Object.keys(state.dogs).map(function (k) { return state.dogs[k]; }).filter(function (d) { return d.image; })
+      .map(function (d) { return { number: d.n, name: d.name, image: d.image, starter: true }; });
+    return (state.people = st.concat(WIZARDS.filter(function (w) { return state.dogs[w.number]; })));
+  }
+  function person(n) { return people().filter(function (w) { return w.number === n; })[0]; }
+  function wizardName(n) { var w = person(n); return w ? wizardName0(w) : "Dog #" + n; }
+  function label(w) { return w.starter ? w.name.replace("Starter, ", "") : "#" + w.number; }
+
+  /* ---------- picker ---------- */
+  function renderPicker(q) {
+    var box = $("#gm-results"); box.innerHTML = "";
+    var raw = String(q || "").trim().toLowerCase(), qs = raw.replace(/[^0-9]/g, "");
+    var all = people(), list = all.filter(function (w) {
+      if (!raw) return true;
+      if (w.starter) return !qs && w.name.toLowerCase().indexOf(raw.replace(/^#/, "")) >= 0;
+      return qs && String(w.number).indexOf(qs) >= 0;
+    });
+    var ns = list.filter(function (w) { return w.starter; }).length, nw = list.length - ns;
+    $("#gm-count").textContent = (ns ? ns + " starter" + (ns === 1 ? "" : "s") + (nw ? " + " : "") : "") + (nw || !ns ? nw + (nw === 1 ? " wizard" : " wizards") : "");
+    var head = function (t) { var h = document.createElement("p"); h.className = "gm-group small"; h.textContent = t; box.appendChild(h); };
+    var last = null;
+    list.forEach(function (w) {
+      if (w.starter !== last) { head(w.starter ? "Starter wizards" : "The Order's 86"); last = w.starter; }
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "gm-pick" + (w.starter ? " is-starter" : "") + (w.number === state.dog ? " is-on" : "");
+      b.setAttribute("aria-pressed", w.number === state.dog ? "true" : "false");
+      b.style.setProperty("--bgc", "#" + (state.dogs[w.number] ? state.dogs[w.number].bg : "333"));
+      b.innerHTML = '<img src="' + w.image + '" alt="" width="64" height="64" loading="lazy"><span>' + label(w) + "</span>";
+      b.title = wizardName0(w);
+      b.addEventListener("click", function () { choose(w.number, true); });
+      box.appendChild(b);
+    });
+    if (!list.length) box.innerHTML = '<p class="muted small gm-empty">No wizard matches. Try 6164, or a hat colour such as "purple".</p>';
+  }
+  function choose(n, push) {
+    state.dog = n;
+    var w = person(n), d = state.dogs[n];
+    $("#gm-chosen-img").src = w.image; $("#gm-chosen-name").textContent = wizardName0(w);
+    $("#gm-chosen-num").textContent = w.starter ? "Starter wizard" : "#" + n;
+    $("#gm-chosen").style.setProperty("--bgc", "#" + d.bg);
+    $("#gm-bg-swatch").style.background = "#" + d.bg;
+    if (push && history.replaceState) history.replaceState(null, "", "?dog=" + n);
+    renderPicker($("#gm-search").value);
+    renderGrid();
+    if (state.open) openPreview(state.open);
+  }
+  /* ---------- grid ---------- */
+  function renderGrid() {
+    var tok = ++state.token, dog = state.dogs[state.dog], mode = state.mode;
+    state.index.forEach(function (s) {
+      var card = $('[data-scene="' + s.id + '"]'), cv = $("canvas", card);
+      card.classList.add("is-loading");
+      loadScene(s.id).then(function (J) {
+        if (tok !== state.token) return;
+        paint(cv, J, compose(J, dog, mode, 0)); card.classList.remove("is-loading");
+      }).catch(function () { card.classList.add("is-error"); });
+    });
+  }
+  function buildCards() {
+    var grid = $("#gm-grid");
+    grid.innerHTML = state.index.map(function (s) {
+      return '<li><button type="button" class="card gm-card" data-scene="' + s.id + '" aria-haspopup="dialog">' +
+        '<span class="card-art gm-art"><canvas width="360" height="360" aria-hidden="true"></canvas><span class="gm-play" aria-hidden="true">&#9654;</span></span>' +
+        '<span class="card-body"><span class="card-name">' + s.title + '</span><span class="card-tag">' + s.nf + " frames &middot; " + (s.ms / 1000).toFixed(1) + "s loop</span></span></button></li>";
+    }).join("");
+    grid.querySelectorAll(".gm-card").forEach(function (b) { b.addEventListener("click", function () { openPreview(b.dataset.scene); }); });
+  }
+  /* ---------- preview + download ---------- */
+  function frameDelay(d) { return d <= 10 ? 100 : d; }   // what browsers show for 0/10 ms frames
+  function openPreview(id) {
+    var dlg = $("#gm-dialog"), s = state.index.filter(function (x) { return x.id === id; })[0];
+    state.open = id; clearTimeout(state.timer);
+    $("#gm-d-title").textContent = s.title + " \u00b7 " + wizardName(state.dog);
+    $("#gm-d-status").textContent = "Loading\u2026";
+    $("#gm-download").disabled = true;
+    if (!dlg.open) { if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", ""); }
+    var dog = state.dogs[state.dog], mode = state.mode, tok = state.token;
+    loadScene(id).then(function (J) {
+      if (state.open !== id) return;
+      var frames = J.frames.map(function (_, f) { return compose(J, dog, mode, f); });
+      state.cur = { J: J, frames: frames, id: id, n: state.dog, mode: mode };
+      var cv = $("#gm-canvas"), k = 0;
+      (function tick() {
+        if (state.open !== id || !dlg.open) return;
+        paint(cv, J, frames[k]); var d = frameDelay(J.durs[k]); k = (k + 1) % frames.length;
+        state.timer = setTimeout(tick, d);
+      })();
+      $("#gm-d-status").textContent = J.nf + " frames, " + J.w + "\u00d7" + J.h + (mode === "dog" ? ", your dog's background" : ", tan background");
+      $("#gm-download").disabled = false;
+    });
+  }
+  function download() {
+    var c = state.cur; if (!c) return;
+    var btn = $("#gm-download"), st = $("#gm-d-status"); btn.disabled = true; st.textContent = "Building your GIF\u2026";
+    setTimeout(function () {
+      var bytes = encodeGIF(c.frames.map(function (d, f) { return { data: d, delay: c.J.durs[f] }; }), { width: c.J.w, height: c.J.h, loop: c.J.loop });
+      var url = URL.createObjectURL(new Blob([bytes], { type: "image/gif" }));
+      var a = document.createElement("a"); a.href = url; a.download = "order86-" + c.id + "-" + c.n + ".gif";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+      st.textContent = "Saved order86-" + c.id + "-" + c.n + ".gif (" + Math.round(bytes.length / 1024) + " KB)"; btn.disabled = false;
+    }, 30);
+  }
+  function closePreview() { var dlg = $("#gm-dialog"); state.open = null; clearTimeout(state.timer); if (dlg.close) dlg.close(); else dlg.removeAttribute("open"); }
+
+  function init() {
+    if (!$("#gm-grid")) return;
+    Promise.all([json("index.json"), json("dogs.json")]).then(function (r) {
+      state.index = r[0]; r[1].forEach(function (d) { state.dogs[d.n] = d; });
+      buildCards();
+      var m = (location.search.match(/[?&]dog=([a-z0-9-]+)/i) || [])[1], q = /^\d+$/.test(m || "") ? parseInt(m, 10) : m;
+      choose(q !== undefined && person(q) ? q : 6164, false);
+    }).catch(function () { $("#gm-grid").innerHTML = '<li class="muted">The GIF maker could not load its files.</li>'; });
+    $("#gm-search").addEventListener("input", function (e) {
+      renderPicker(e.target.value);
+      var v = e.target.value.trim().toLowerCase(), n = /^#?\d+$/.test(v) ? parseInt(v.replace("#", ""), 10) : NaN;
+      if (person(n) && !person(n).starter && n !== state.dog) choose(n, true);
+    });
+    document.querySelectorAll('input[name="gm-bg"]').forEach(function (r) {
+      r.addEventListener("change", function () { if (r.checked) { state.mode = r.value; renderGrid(); if (state.open) openPreview(state.open); } });
+    });
+    $("#gm-download").addEventListener("click", download);
+    $("#gm-close").addEventListener("click", closePreview);
+    $("#gm-dialog").addEventListener("close", function () { state.open = null; clearTimeout(state.timer); });
+    $("#gm-dialog").addEventListener("click", function (e) { if (e.target.id === "gm-dialog") closePreview(); });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
+})();

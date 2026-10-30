@@ -1,0 +1,522 @@
+[
+{
+"id": "barking",
+"title": "Barking",
+"library": "BARKING-",
+"nf": 16,
+"w": 1080,
+"h": 1080,
+"np": 1,
+"ms": 2100
+},
+{
+"id": "potion",
+"title": "Potion",
+"library": "potion",
+"nf": 17,
+"w": 1080,
+"h": 1080,
+"np": 5,
+"ms": 1700
+},
+{
+"id": "broom",
+"title": "Broom ride",
+"library": "potter",
+"nf": 16,
+"w": 1080,
+"h": 1080,
+"np": 16,
+"ms": 1600
+},
+{
+"id": "book",
+"title": "Book",
+"library": "Book",
+"nf": 8,
+"w": 1080,
+"h": 1080,
+"np": 7,
+"ms": 800
+},
+{
+"id": "lock-in",
+"title": "Lock in",
+"library": "lock-in",
+"nf": 17,
+"w": 1080,
+"h": 1080,
+"np": 8,
+"ms": 2900
+},
+{
+"id": "standup",
+"title": "Stand-up",
+"library": "standup-dog",
+"nf": 10,
+"w": 1080,
+"h": 1080,
+"np": 5,
+"ms": 1000
+},
+{
+"id": "hourglass",
+"title": "Hourglass",
+"library": "hourglass",
+"nf": 8,
+"w": 1080,
+"h": 1080,
+"np": 5,
+"ms": 800
+},
+{
+"id": "jumping",
+"title": "Jumping",
+"library": "jumping",
+"nf": 12,
+"w": 1080,
+"h": 1080,
+"np": 11,
+"ms": 1300
+},
+{
+"id": "rollercoaster",
+"title": "Rollercoaster",
+"library": "rollercoaster",
+"nf": 21,
+"w": 1080,
+"h": 1080,
+"np": 20,
+"ms": 2100
+},
+{
+"id": "food-coma",
+"title": "Food coma",
+"library": "foodpregnant",
+"nf": 15,
+"w": 1080,
+"h": 1080,
+"np": 2,
+"ms": 1500
+},
+{
+"id": "baking",
+"title": "Baking",
+"library": "baking",
+"nf": 12,
+"w": 1080,
+"h": 1080,
+"np": 11,
+"ms": 1200
+},
+{
+"id": "beachball",
+"title": "Beachball",
+"library": "beachball",
+"nf": 18,
+"w": 1080,
+"h": 1080,
+"np": 13,
+"ms": 1800
+},
+{
+"id": "bench",
+"title": "Bench",
+"library": "bench",
+"nf": 8,
+"w": 1080,
+"h": 1080,
+"np": 8,
+"ms": 800
+},
+{
+"id": "blockchain-dots",
+"title": "Blockchain Dots",
+"library": "Blockchain-dots",
+"nf": 11,
+"w": 1080,
+"h": 1080,
+"np": 10,
+"ms": 2200
+},
+{
+"id": "builder",
+"title": "Builder",
+"library": "builder",
+"nf": 14,
+"w": 1080,
+"h": 1080,
+"np": 7,
+"ms": 1400
+},
+{
+"id": "cardio",
+"title": "Cardio",
+"library": "cardio",
+"nf": 31,
+"w": 1080,
+"h": 1080,
+"np": 31,
+"ms": 3100
+},
+{
+"id": "checklistlist",
+"title": "Checklistlist",
+"library": "checklistlist",
+"nf": 11,
+"w": 1000,
+"h": 1000,
+"np": 7,
+"ms": 1900
+},
+{
+"id": "cookin",
+"title": "Cookin",
+"library": "cookin",
+"nf": 10,
+"w": 1080,
+"h": 1080,
+"np": 10,
+"ms": 1000
+},
+{
+"id": "csn",
+"title": "Csn",
+"library": "CSN",
+"nf": 14,
+"w": 1080,
+"h": 1080,
+"np": 12,
+"ms": 1400
+},
+{
+"id": "everything-is-fine",
+"title": "Everything Is Fine",
+"library": "everything-is-fine",
+"nf": 15,
+"w": 1080,
+"h": 1080,
+"np": 15,
+"ms": 1500
+},
+{
+"id": "forklift",
+"title": "Forklift",
+"library": "forklift",
+"nf": 17,
+"w": 1080,
+"h": 1080,
+"np": 14,
+"ms": 1700
+},
+{
+"id": "full-body-dog-saved",
+"title": "Full Body Dog Saved",
+"library": "Full-body-dog-saved",
+"nf": 8,
+"w": 1080,
+"h": 1080,
+"np": 8,
+"ms": 800
+},
+{
+"id": "gaming",
+"title": "Gaming",
+"library": "Gaming",
+"nf": 8,
+"w": 1080,
+"h": 1080,
+"np": 5,
+"ms": 800
+},
+{
+"id": "hammock2",
+"title": "Hammock2",
+"library": "Hammock2",
+"nf": 9,
+"w": 1080,
+"h": 1080,
+"np": 7,
+"ms": 900
+},
+{
+"id": "her-bark-love",
+"title": "Her Bark Love",
+"library": "her-bark-love",
+"nf": 15,
+"w": 1080,
+"h": 1080,
+"np": 12,
+"ms": 1500
+},
+{
+"id": "him-bark-love",
+"title": "Him Bark Love",
+"library": "him-bark-love_",
+"nf": 15,
+"w": 1080,
+"h": 1080,
+"np": 12,
+"ms": 1500
+},
+{
+"id": "intergalactic",
+"title": "Intergalactic",
+"library": "intergalactic",
+"nf": 13,
+"w": 1080,
+"h": 1080,
+"np": 4,
+"ms": 1300
+},
+{
+"id": "laptop",
+"title": "Laptop",
+"library": "laptop",
+"nf": 25,
+"w": 1080,
+"h": 1080,
+"np": 11,
+"ms": 2500
+},
+{
+"id": "laser-ball",
+"title": "Laser Ball",
+"library": "Laser_ball",
+"nf": 34,
+"w": 1000,
+"h": 1000,
+"np": 15,
+"ms": 4300
+},
+{
+"id": "painter-flying",
+"title": "Painter Flying",
+"library": "painter-flying",
+"nf": 10,
+"w": 1080,
+"h": 1080,
+"np": 10,
+"ms": 1000
+},
+{
+"id": "pilot",
+"title": "Pilot",
+"library": "pilot",
+"nf": 17,
+"w": 1080,
+"h": 1080,
+"np": 15,
+"ms": 1700
+},
+{
+"id": "printing",
+"title": "Printing",
+"library": "printing",
+"nf": 7,
+"w": 1080,
+"h": 1080,
+"np": 5,
+"ms": 700
+},
+{
+"id": "profile-scroll",
+"title": "Profile Scroll",
+"library": "profile-scroll",
+"nf": 20,
+"w": 1080,
+"h": 1080,
+"np": 19,
+"ms": 2000
+},
+{
+"id": "redlove",
+"title": "Redlove",
+"library": "redlove",
+"nf": 37,
+"w": 1080,
+"h": 1080,
+"np": 18,
+"ms": 3700
+},
+{
+"id": "shooting-star",
+"title": "Shooting Star",
+"library": "shooting-star",
+"nf": 24,
+"w": 1080,
+"h": 1080,
+"np": 20,
+"ms": 2400
+},
+{
+"id": "shopify",
+"title": "Shopify",
+"library": "Shopify",
+"nf": 16,
+"w": 1080,
+"h": 1080,
+"np": 5,
+"ms": 1600
+},
+{
+"id": "spaces-love",
+"title": "Spaces Love",
+"library": "spaces-love",
+"nf": 27,
+"w": 1080,
+"h": 1080,
+"np": 11,
+"ms": 2700
+},
+{
+"id": "summer-dog",
+"title": "Summer Dog",
+"library": "summer-dog",
+"nf": 20,
+"w": 1080,
+"h": 1080,
+"np": 20,
+"ms": 2000
+},
+{
+"id": "trapaholicsmixtape2",
+"title": "Trapaholicsmixtape2",
+"library": "trapaholicsmixtape2",
+"nf": 8,
+"w": 1000,
+"h": 1000,
+"np": 6,
+"ms": 800
+},
+{
+"id": "vibes",
+"title": "Vibes",
+"library": "vibes",
+"nf": 21,
+"w": 1080,
+"h": 1080,
+"np": 16,
+"ms": 2100
+},
+{
+"id": "werking",
+"title": "Werking",
+"library": "werking",
+"nf": 2,
+"w": 1080,
+"h": 1080,
+"np": 2,
+"ms": 200
+},
+{
+"id": "4x4",
+"title": "4X4",
+"library": "4x4",
+"nf": 12,
+"w": 1080,
+"h": 1080,
+"np": 12,
+"ms": 1200
+},
+{
+"id": "bone-bounce",
+"title": "Bone Bounce",
+"library": "bone-bounce",
+"nf": 13,
+"w": 1080,
+"h": 1080,
+"np": 13,
+"ms": 3300
+},
+{
+"id": "boomdog",
+"title": "Boomdog",
+"library": "boomdog",
+"nf": 10,
+"w": 1080,
+"h": 1080,
+"np": 9,
+"ms": 1000
+},
+{
+"id": "ddmovietiiiime",
+"title": "Ddmovietiiiime",
+"library": "ddmovietiiiime",
+"nf": 7,
+"w": 1000,
+"h": 1000,
+"np": 5,
+"ms": 1900
+},
+{
+"id": "golfing",
+"title": "Golfing",
+"library": "Golfing",
+"nf": 12,
+"w": 1080,
+"h": 1080,
+"np": 12,
+"ms": 1200
+},
+{
+"id": "paraglide",
+"title": "Paraglide",
+"library": "paraglide",
+"nf": 16,
+"w": 1080,
+"h": 1080,
+"np": 16,
+"ms": 1600
+},
+{
+"id": "royalty",
+"title": "Royalty",
+"library": "royalty",
+"nf": 11,
+"w": 1080,
+"h": 1080,
+"np": 10,
+"ms": 2600
+},
+{
+"id": "teacher",
+"title": "Teacher",
+"library": "teacher",
+"nf": 14,
+"w": 1080,
+"h": 1080,
+"np": 3,
+"ms": 1400
+},
+{
+"id": "vegas-floatie",
+"title": "Vegas Floatie",
+"library": "vegas-floatie",
+"nf": 11,
+"w": 1080,
+"h": 1080,
+"np": 8,
+"ms": 1100
+},
+{
+"id": "wall",
+"title": "Wall",
+"library": "wall",
+"nf": 26,
+"w": 1080,
+"h": 1080,
+"np": 19,
+"ms": 4800
+},
+{
+"id": "windy",
+"title": "Windy",
+"library": "windy",
+"nf": 10,
+"w": 1080,
+"h": 1080,
+"np": 10,
+"ms": 1000
+}
+]
