@@ -239,6 +239,23 @@ select option,select optgroup{background:var(--night-2);color:var(--text)}
   .hs-cap{font-size:13px;max-width:calc(100% + 64px);padding:5px 10px}
 }
 @media (max-width:520px){.kicker,.eyebrow{font-size:14px}.hero{padding-top:var(--s-4)}.hero-art{max-width:354px}.stats dd{font-size:20px}.stats dt{font-size:15px}.stats div+div{padding-left:24px;background-position:6px 40%;background-size:10px 10px}}
+/* phones: a tidy single column: equal full-width main buttons, a smaller lore button, 2x2 stats boxes,
+   and a compact square portrait card (no moons, no arch) right after the stats */
+@media (max-width:900px){
+  .hero{gap:var(--s-5);padding-bottom:var(--s-4)}
+  .cta{display:grid;grid-template-columns:1fr;gap:12px;margin-top:var(--s-5)}
+  .cta .btn{width:100%;justify-content:center}
+  .cta .btn:nth-child(3){width:auto;justify-self:center;min-height:38px;padding:0 16px;font-size:13px}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:var(--s-5)}
+  .stats div,.stats div+div{justify-content:center;padding:8px 6px;background:var(--panel);box-shadow:0 0 0 3px var(--ink-0)}
+  .phases{display:none}
+  .hero-art{aspect-ratio:auto;max-width:260px;margin:0 auto var(--s-4)}
+  .hero-portrait{position:relative;left:auto;right:auto;top:auto;width:100%}
+  .hs-frame,.hs-frame::before,.hs-frame::after,.hs-win{clip-path:none}
+  .hs-win{aspect-ratio:1}
+  .hero-show .hs-img{left:0;right:0;width:100%}
+  .hs-cap{max-width:calc(100% + 24px)}
+}
 
 /* ---------- Roster ---------- */
 .toolbar{display:grid;grid-template-columns:1fr 220px 220px;gap:var(--s-3);position:sticky;top:calc(var(--nav-h) + 12px);z-index:5;padding:12px;margin:0 0}
