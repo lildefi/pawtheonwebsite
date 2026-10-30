@@ -502,3 +502,12 @@ select option{background:var(--night-2);color:var(--text)}
   .phases{top:-26%;left:-4%;right:-4%}
   .phase.ph0,.phase.ph6{--y:72px}.phase.ph1,.phase.ph5{--y:30px}.phase.ph2,.phase.ph4{--y:7px}.phase.ph3{--y:0px}
 }
+
+/* hero slideshow of wizards */
+.hero-show{display:block;text-decoration:none;background:#f8e49e}
+.hero-show .hs-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 70%;image-rendering:pixelated;opacity:0;transition:opacity 1.1s ease}
+.hero-show .hs-img.is-on{opacity:1}
+.hs-cap{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:2;padding:3px 14px;background:rgba(236,220,184,.95);color:var(--ink);font:italic .95rem var(--body,serif);border-radius:6px 3px 7px 4px;box-shadow:0 2px 6px rgba(0,0,0,.35);white-space:nowrap}
+.hs-cap:empty{display:none}
+@media (prefers-reduced-motion:reduce){.hero-show .hs-img{transition:opacity .3s}}
+@media (max-width:900px){.hs-cap{font-size:.74rem;white-space:normal;width:max-content;max-width:88%;text-align:center;bottom:8px;line-height:1.25}}
