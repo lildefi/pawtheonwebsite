@@ -484,8 +484,6 @@ select option,select optgroup{background:var(--night-2);color:var(--text)}
 .site-footer{margin-top:var(--s-9);padding-top:var(--s-5);background:var(--px-div-night) center 0/483px 27px no-repeat}
 .footer-inner{display:flex;align-items:center;justify-content:space-between;gap:var(--s-5);flex-wrap:wrap;padding-top:var(--s-6);padding-bottom:var(--s-7)}
 .footer-inner p{margin:0;color:var(--muted)}
-.moons-mini{display:flex;align-items:center;gap:8px}
-.moons-mini .mm{width:24px;height:24px;image-rendering:pixelated}
 @media (max-width:720px){.footer-inner{flex-direction:column;align-items:flex-start}}
 
 /* ---------- GIF maker ---------- */
