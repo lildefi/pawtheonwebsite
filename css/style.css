@@ -444,6 +444,7 @@ select option{background:var(--surface);color:var(--text)}
 .starter-actions{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
 .btn-sm{padding:6px 12px;font-size:.8rem;min-height:0}
 .join-note{margin-top:var(--s-4)}
+
 /* sealed howls: fully blurred, nothing readable */
 .howl.is-locked{position:relative;overflow:hidden}
 .howl-sealed{display:flex;gap:inherit;align-items:inherit;filter:blur(9px);opacity:.55;user-select:none;pointer-events:none}
