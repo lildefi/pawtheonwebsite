@@ -4,9 +4,9 @@
  * then the frames are encoded with js/gifenc.js. Nothing is uploaded. */
 (function () {
   "use strict";
-  var BASE = "gifs/", V = "12";
+  var BASE = "gifs/", V = "13";
   var $ = function (s, el) { return (el || document).querySelector(s); };
-  var state = { dog: null, mode: "dog", index: [], dogs: {}, scenes: {}, open: null, timer: 0, token: 0 };
+  var state = { dog: null, mode: "dog", index: [], dogs: {}, full: {}, scenes: {}, open: null, timer: 0, token: 0 };
 
   function json(u) { return fetch(BASE + u + "?v=" + V).then(function (r) { if (!r.ok) throw new Error(u); return r.json(); }); }
   function hex(h) { return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]; }
@@ -15,7 +15,23 @@
   }
   /* Memory-light loading (phones): scene.json is cached; decoded plates are kept only for the scene being previewed. */
   var jsonCache = {}, plateKeep = { id: null, plates: null };
-  function sceneJSON(id) { return jsonCache[id] || (jsonCache[id] = json(id + "/scene.json")); }
+  /* scene.json ships each distinct op list once (J.ol); a string entry is base64 of its bytes */
+  function unpack(J) {
+    var ol = (J.ol || []).map(function (e) {
+      if (typeof e !== "string") return e;
+      var b = atob(e), a = new Uint8Array(b.length);
+      for (var i = 0; i < b.length; i++) a[i] = b.charCodeAt(i);
+      return a;
+    });
+    J.frames.forEach(function (fr) { if (fr.o !== undefined) fr.ops = ol[fr.o]; });
+    delete J.ol; return J;
+  }
+  function sceneJSON(id) { return jsonCache[id] || (jsonCache[id] = json(id + "/scene.json").then(unpack)); }
+  /* the full dog (palette, portrait states, textures) is fetched when it is first chosen */
+  var dogCache = {};
+  function fullDog(n) {
+    return dogCache[n] || (dogCache[n] = json("d/" + n + ".json").then(function (d) { state.full[n] = d; return d; }));
+  }
   function decode(J, ims) {
     var c = document.createElement("canvas"); c.width = J.w; c.height = J.h;
     var x = c.getContext("2d", { willReadFrequently: true });
@@ -34,15 +50,72 @@
     });
   }
   function withPlates(J0, pl) { var J = Object.create(J0); J.plates = pl; return J; }
-  /* just frame 0's plate, for a thumbnail; nothing is kept afterwards */
-  function loadThumb(id) {
-    return sceneJSON(id).then(function (J0) {
-      var p0 = J0.frames[0].p;
-      if (plateKeep.id === id) { var J = withPlates(J0, []); J.plates[p0] = plateKeep.plates[p0]; return J; }
-      return img(id + "/p" + p0 + ".png").then(function (im) {
-        var J = withPlates(J0, []); J.plates[p0] = decode(J0, [im])[0]; return J;
-      });
+  /* thumbnails: t.png is frame 0's plate already sampled to the 360x360 tile (pixel centres, nearest neighbour), so a
+     tile composes 360x360 pixels instead of the full frame. Decoded tile plates are kept for recent scenes (dog switch). */
+  var TS = 360, thumbKeep = {}, thumbOrder = [], THUMB_KEEP = 40;
+  function thumbPlate(id) {
+    if (thumbKeep[id]) return thumbKeep[id];
+    var pr = thumbKeep[id] = img(id + "/t.png").then(function (im) {
+      var c = document.createElement("canvas"); c.width = c.height = TS;
+      var x = c.getContext("2d", { willReadFrequently: true }); x.drawImage(im, 0, 0);
+      var d = x.getImageData(0, 0, TS, TS).data; c.width = c.height = 1; return d;
     });
+    pr.catch(function () { delete thumbKeep[id]; });
+    thumbOrder.push(id);
+    while (thumbOrder.length > THUMB_KEEP) delete thumbKeep[thumbOrder.shift()];
+    return pr;
+  }
+  function loadThumb(id) { return Promise.all([sceneJSON(id), thumbPlate(id)]); }
+  /* tile pixel t shows source pixel floor((2t+1)*w/(2*TS)) - the same sampling as drawing the full frame into the tile */
+  function thumbMap(J) {
+    if (J._tm) return J._tm;
+    function axis(n, cuts) {
+      var s = [], lo = [], hi = [], t, k;
+      for (t = 0; t < TS; t++) s.push(Math.floor((2 * t + 1) * n / (2 * TS)));
+      for (k = 0; k + 1 < cuts.length; k++) {
+        t = 0; while (t < TS && s[t] < cuts[k]) t++; lo.push(t);
+        while (t < TS && s[t] < cuts[k + 1]) t++; hi.push(t);
+      }
+      return { s: s, lo: lo, hi: hi };
+    }
+    return (J._tm = { x: axis(J.w, J.xs), y: axis(J.h, J.ys) });
+  }
+  function firstAt(s, v) { var t = 0; while (t < TS && s[t] < v) t++; return t; }
+  function opColor(dog, pal, roles, g, ops, o) {
+    var kind = ops[o + 2];
+    if (kind === 2) return roles[ops[o + 5]];
+    if (kind >= 5 && kind <= 6) return texCol(dog, pal, roles, kind, ops[o + 3], ops[o + 4], ops[o + 5]);
+    var pi = g.charCodeAt(ops[o + 3] * 25 + ops[o + 4]) - 48;
+    if (pi !== 0) return pal[pi];
+    if (kind !== 1) return null;
+    return texCol(dog, pal, roles, 6, Math.min(24, Math.max(19, ops[o + 3])), Math.min(22, Math.max(2, ops[o + 4])), ops[o + 5]);
+  }
+  /* frame 0 at tile size: identical to compose() followed by a nearest-neighbour draw into the 360x360 tile */
+  function composeThumb(J, tp, dog, mode) {
+    var d = new Uint8ClampedArray(tp), i;
+    if (mode === "dog") {
+      var M = bgMap(J, dog), last = -1, hit = null;
+      for (i = 0; i < d.length; i += 4) {
+        var c = (d[i] << 16) | (d[i + 1] << 8) | d[i + 2];
+        if (c !== last) { last = c; hit = M.get(c) || null; }
+        if (hit) { d[i] = hit[0]; d[i + 1] = hit[1]; d[i + 2] = hit[2]; }
+      }
+    }
+    var pal = dog._pal || (dog._pal = dog.pal.map(hex)), roles = dog._roles || (dog._roles = dog.roles.map(hex));
+    var fr = J.frames[0], g = dog.g[fr.st], ops = fr.ops, tm = thumbMap(J);
+    for (var o = 0; o < ops.length; o += 6) {
+      var col = opColor(dog, pal, roles, g, ops, o), y0, y1, x0, x1;
+      if (!col) continue;
+      if (ops[o + 2] === 8) {
+        var sz = ops[o + 5];
+        y0 = firstAt(tm.y.s, ops[o]); y1 = firstAt(tm.y.s, ops[o] + sz); x0 = firstAt(tm.x.s, ops[o + 1]); x1 = firstAt(tm.x.s, ops[o + 1] + sz);
+      } else { y0 = tm.y.lo[ops[o]]; y1 = tm.y.hi[ops[o]]; x0 = tm.x.lo[ops[o + 1]]; x1 = tm.x.hi[ops[o + 1]]; }
+      for (var y = y0; y < y1; y++) {
+        var p = (y * TS + x0) * 4;
+        for (var x = x0; x < x1; x++, p += 4) { d[p] = col[0]; d[p + 1] = col[1]; d[p + 2] = col[2]; d[p + 3] = 255; }
+      }
+    }
+    return d;
   }
   /* background family -> the wizard's PFP background, keeping each shade's lightness (same rule as the build) */
   function bgMap(J, dog) {
@@ -140,12 +213,15 @@
   }
   function person(n) { return people().filter(function (w) { return w.number === n; })[0]; }
   function wizardName(n) { var w = person(n); return w ? wizardName0(w) : "Dog #" + n; }
+  /* picker buttons use small 150px copies of the portraits (images/pick, built by gifmaker/export.py) */
+  function pickImg(src) { return String(src).replace(/^images\/(dogs|starters)\//, "images/pick/"); }
   function label(w) { return w.starter ? w.name.replace("Starter, ", "") : "#" + w.number; }
 
   /* ---------- picker ---------- */
   function renderPicker(q) {
     var box = $("#gm-results"); box.innerHTML = "";
     var raw = String(q || "").trim().toLowerCase(), qs = raw.replace(/[^0-9]/g, "");
+    state.pickerQ = q;
     var all = people(), list = all.filter(function (w) {
       if (!raw) return true;
       if (w.starter) return !qs && w.name.toLowerCase().indexOf(raw.replace(/^#/, "")) >= 0;
@@ -161,8 +237,8 @@
       b.type = "button"; b.className = "gm-pick" + (w.starter ? " is-starter" : "") + (w.number === state.dog ? " is-on" : "");
       b.setAttribute("aria-pressed", w.number === state.dog ? "true" : "false");
       b.style.setProperty("--bgc", "#" + (state.dogs[w.number] ? state.dogs[w.number].bg : "333"));
-      b.innerHTML = '<img src="' + w.image + '" alt="" width="64" height="64" loading="lazy"><span>' + label(w) + "</span>";
-      b.title = wizardName0(w);
+      b.innerHTML = '<img src="' + pickImg(w.image) + '" alt="" width="64" height="64" loading="lazy" decoding="async"><span>' + label(w) + "</span>";
+      b.title = wizardName0(w); b.dataset.n = String(w.number);
       b.addEventListener("click", function () { choose(w.number, true); });
       box.appendChild(b);
     });
@@ -176,35 +252,65 @@
     $("#gm-chosen").style.setProperty("--bgc", "#" + d.bg);
     $("#gm-bg-swatch").style.background = "#" + d.bg;
     if (push && history.replaceState) history.replaceState(null, "", "?dog=" + n);
-    renderPicker($("#gm-search").value);
-    renderGrid();
-    if (state.open) openPreview(state.open);
+    /* picker: only the pressed state changes (the list is rebuilt only when the search text changes) */
+    if (state.pickerQ === undefined || state.pickerQ !== $("#gm-search").value) renderPicker($("#gm-search").value);
+    else document.querySelectorAll("#gm-results .gm-pick").forEach(function (b) {
+      var on = b.dataset.n === String(n); b.classList.toggle("is-on", on); b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+    var tok = ++state.chooseTok;
+    document.querySelectorAll(".gm-card").forEach(function (c) { c.classList.add("is-loading"); });
+    fullDog(n).then(function () {
+      if (tok !== state.chooseTok) return;
+      renderGrid();
+      if (state.open) openPreview(state.open);
+    }).catch(function () { $("#gm-d-status").textContent = "Couldn't load this wizard. Try again."; });
   }
   /* ---------- grid ---------- */
-  /* thumbnails render one at a time, only when their card scrolls near the screen */
-  var queue = [], busy = false, seen = {}, io = null;
-  function pump() {
-    if (busy || !queue.length) return;
-    busy = true;
-    var job = queue.shift();
-    loadThumb(job.id).then(function (J) {
-      if (job.tok === state.token) { paint(job.cv, J, compose(J, state.dogs[state.dog], state.mode, 0)); job.card.classList.remove("is-loading"); }
-    }).catch(function () { job.card.classList.add("is-error"); })
-      .then(function () { busy = false; setTimeout(pump, 0); });
+  /* thumbnails: cards on (or near) the screen are drawn first, in page order; a few tile files load in parallel and one
+     tile is composed per task so scrolling stays smooth. A dog or background switch redraws from the kept tile plates. */
+  var near = {}, done = {}, inflight = 0, MAXFLIGHT = 4, ready = [], io = null, drawQueued = false, cardList = [];
+  function nextJob() {
+    for (var i = 0; i < cardList.length; i++) {
+      var c = cardList[i], id = c.dataset.scene;
+      if (near[id] && done[id] !== state.token && !c._busy) return c;
+    }
+    return null;
   }
-  function want(card) {
-    var id = card.dataset.scene;
-    if (seen[id] === state.token) return; seen[id] = state.token;
-    queue = queue.filter(function (q) { return q.id !== id; });
-    queue.push({ id: id, card: card, cv: $("canvas", card), tok: state.token }); pump();
+  function pump() {
+    while (inflight < MAXFLIGHT) {
+      var card = nextJob(); if (!card) break;
+      card._busy = true; inflight++;
+      (function (card, tok) {
+        loadThumb(card.dataset.scene).then(function (r) { ready.push({ card: card, tok: tok, J: r[0], tp: r[1] }); kickDraw(); },
+          function () { card._busy = false; inflight--; card.classList.add("is-error"); pump(); });
+      })(card, state.token);
+    }
+  }
+  function kickDraw() { if (!drawQueued) { drawQueued = true; setTimeout(drawOne, 0); } }
+  function drawOne() {
+    drawQueued = false;
+    var job = ready.shift(); if (!job) return;
+    var card = job.card, id = card.dataset.scene, dog = state.full[state.dog];
+    card._busy = false; inflight--;
+    if (job.tok === state.token && dog) {
+      var cv = $("canvas", card);
+      cv.getContext("2d").putImageData(new ImageData(composeThumb(job.J, job.tp, dog, state.mode), TS, TS), 0, 0);
+      card.classList.remove("is-loading"); done[id] = job.tok;
+    }
+    pump(); if (ready.length) kickDraw();
   }
   function renderGrid() {
-    ++state.token; queue = []; seen = {};
-    var cards = document.querySelectorAll(".gm-card");
-    cards.forEach(function (c) { c.classList.add("is-loading"); });
-    if (!("IntersectionObserver" in window)) { cards.forEach(want); return; }
-    if (!io) io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) want(e.target); }); }, { rootMargin: "400px 0px" });
-    cards.forEach(function (c) { io.unobserve(c); io.observe(c); });
+    ++state.token;
+    cardList.forEach(function (c) { c.classList.add("is-loading"); });
+    if (!("IntersectionObserver" in window)) { cardList.forEach(function (c) { near[c.dataset.scene] = true; }); pump(); return; }
+    if (!io) {
+      io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { near[e.target.dataset.scene] = e.isIntersecting; });
+        pump();
+      }, { rootMargin: "300px 0px" });
+      cardList.forEach(function (c) { io.observe(c); });
+    }
+    pump();
   }
   function buildCards() {
     var grid = $("#gm-grid");
@@ -213,7 +319,8 @@
         '<span class="card-art gm-art"><canvas width="360" height="360" aria-hidden="true"></canvas><span class="gm-play" aria-hidden="true">&#9654;</span></span>' +
         '<span class="card-body"><span class="card-name">' + s.title + '</span><span class="card-tag">' + s.nf + " frames &middot; " + (s.ms / 1000).toFixed(1) + "s loop</span></span></button></li>";
     }).join("");
-    grid.querySelectorAll(".gm-card").forEach(function (b) { b.addEventListener("click", function () { openPreview(b.dataset.scene); }); });
+    cardList = Array.prototype.slice.call(grid.querySelectorAll(".gm-card"));
+    cardList.forEach(function (b) { b.addEventListener("click", function () { openPreview(b.dataset.scene); }); });
   }
   /* ---------- preview + download ---------- */
   function frameDelay(d) { return d <= 10 ? 100 : d; }   // what browsers show for 0/10 ms frames
@@ -224,8 +331,10 @@
     $("#gm-d-status").textContent = "Loading\u2026";
     $("#gm-download").disabled = true;
     if (!dlg.open) { if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", ""); }
-    var dog = state.dogs[state.dog], mode = state.mode, tok = state.token;
-    loadScene(id).then(function (J) {
+    var mode = state.mode, n0 = state.dog;
+    Promise.all([loadScene(id), fullDog(n0)]).then(function (r) {
+      var J = r[0], dog = r[1];
+      if (state.dog !== n0) return;
       if (state.open !== id) return;
       /* frames are composed as they play, so only one is in memory at a time */
       state.cur = { J: J, id: id, n: state.dog, mode: mode, dog: dog };
@@ -260,7 +369,8 @@
 
   function init() {
     if (!$("#gm-grid")) return;
-    Promise.all([json("index.json"), json("dogs.json")]).then(function (r) {
+    state.chooseTok = 0;
+    Promise.all([json("index.json"), json("dogi.json")]).then(function (r) {
       state.index = r[0]; r[1].forEach(function (d) { state.dogs[d.n] = d; });
       buildCards();
       var m = (location.search.match(/[?&]dog=([a-z0-9-]+)/i) || [])[1], q = /^\d+$/.test(m || "") ? parseInt(m, 10) : m;
