@@ -240,7 +240,7 @@ select option,select optgroup{background:var(--night-2);color:var(--text)}
 }
 @media (max-width:520px){.kicker,.eyebrow{font-size:14px}.hero{padding-top:var(--s-4)}.hero-art{max-width:354px}.stats dd{font-size:20px}.stats dt{font-size:15px}.stats div+div{padding-left:24px;background-position:6px 40%;background-size:10px 10px}}
 /* phones: a tidy single column: equal full-width main buttons, a smaller lore button, 2x2 stats boxes,
-   and a compact square portrait card (no moons, no arch) right after the stats */
+   and no slideshow card at all (the hero ends after the stats) */
 @media (max-width:900px){
   .hero{gap:var(--s-5);padding-bottom:var(--s-4)}
   .cta{display:grid;grid-template-columns:1fr;gap:12px;margin-top:var(--s-5)}
@@ -249,7 +249,7 @@ select option,select optgroup{background:var(--night-2);color:var(--text)}
   .stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:var(--s-5)}
   .stats div,.stats div+div{justify-content:center;padding:8px 6px;background:var(--panel);box-shadow:0 0 0 3px var(--ink-0)}
   .phases{display:none}
-  .hero-art{aspect-ratio:auto;max-width:260px;margin:0 auto var(--s-4)}
+  .hero-art{display:none}
   .hero-portrait{position:relative;left:auto;right:auto;top:auto;width:100%}
   .hs-frame,.hs-frame::before,.hs-frame::after,.hs-win{clip-path:none}
   .hs-win{aspect-ratio:1}
