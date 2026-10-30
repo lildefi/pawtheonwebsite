@@ -232,7 +232,7 @@ select option,select optgroup{background:var(--night-2);color:var(--text)}
 .orbit-img{width:100%;height:100%;image-rendering:pixelated;transform:rotate(calc(var(--i) * -51.43deg))}
 @media (max-width:900px){
   .hero{grid-template-columns:1fr;gap:var(--s-4);min-height:0}
-  .hero-art{order:-1;max-width:354px;margin-top:84px;margin-bottom:36px}
+  .hero-art{max-width:354px;margin-top:84px;margin-bottom:36px}
   .hero-portrait{left:calc(20% + (60% - 24px) * .075);right:calc(20% + (60% - 24px) * .075);top:9%}
   .phase{--s:44px}.phase.ph1{--s:56px}.phase.ph3{--s:44px}.phase.ph6{--s:30px}
   .phase.ph0{--x:4.00%;--yy:35.00%}.phase.ph1{--x:10.16%;--yy:13.00%}.phase.ph2{--x:27.00%;--yy:-3.11%}.phase.ph3{--x:50.00%;--yy:-9.00%}.phase.ph4{--x:73.00%;--yy:-3.11%}.phase.ph5{--x:89.84%;--yy:13.00%}.phase.ph6{--x:96.00%;--yy:35.00%}
@@ -248,6 +248,7 @@ select option,select optgroup{background:var(--night-2);color:var(--text)}
 .field-search input{padding-left:40px}
 .count{color:var(--muted);margin:var(--s-5) 0 var(--s-5)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:var(--s-6) var(--s-6)}
+.grid>*{min-width:0}
 .card-shell{position:relative;display:flex;flex-direction:column;gap:12px;min-width:0}
 .card-shell .card{flex:1}
 .card{position:relative;display:flex;flex-direction:column;padding:8px 8px 0;overflow:visible;color:var(--text);text-decoration:none}
@@ -277,7 +278,7 @@ select option,select optgroup{background:var(--night-2);color:var(--text)}
 .holder-link:hover{text-decoration:underline;color:var(--gold)}
 .holder-link-lg{font-size:1.2rem}
 @media (max-width:820px){.toolbar{grid-template-columns:1fr 1fr;padding:10px}.field-search{grid-column:1/-1}}
-@media (max-width:520px){.grid{grid-template-columns:repeat(2,1fr);gap:var(--s-6) 22px}.card{padding:6px 6px 0}.card-body{padding:10px 2px 12px}.card-name{font-size:.98rem}.card-tag{font-size:.8rem}.card-num,.card-rank{font-size:12px;padding:2px 4px;top:4px}.card-num{left:4px}.card-rank{right:4px}.card-holder{font-size:.84rem}}
+@media (max-width:520px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-6) 22px}.card{padding:6px 6px 0}.card-body{padding:10px 2px 12px}.card-name{font-size:.98rem}.card-tag{font-size:.8rem}.card-num,.card-rank{font-size:12px;padding:2px 4px;top:4px}.card-num{left:4px}.card-rank{right:4px}.card-holder{font-size:.84rem}}
 
 .callout{display:flex;align-items:center;justify-content:space-between;gap:var(--s-5);flex-wrap:wrap;padding:clamp(28px,5vw,52px);--in:var(--panel-2)}
 .callout .muted{margin:var(--s-3) 0 0;max-width:520px}
@@ -490,9 +491,13 @@ select option,select optgroup{background:var(--night-2);color:var(--text)}
 .gm-bg .seg{display:grid;width:100%}
 .gm-bg .seg-opt span{padding:0 10px;font-size:.95rem;text-align:center}
 .gm-gallery .h3{margin:0 0 var(--s-5);font-size:1.9rem;text-shadow:3px 3px 0 var(--ink-0)}
-.gm-grid{list-style:none;margin:0;padding:0;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.gm-grid{list-style:none;margin:0;padding:0;grid-template-columns:repeat(auto-fill,minmax(min(200px,100%),1fr))}
 .gm-card{width:100%;text-align:left;font:inherit;cursor:pointer;--bgc:#e8c27a;border:0;border-radius:0}
-.gm-art canvas{width:100%;height:100%}
+/* tiles: equal columns on every phone (no min-content sizing from the 360px canvas), canvas never sizes its box */
+.gm-card{min-width:0}
+.gm-art{width:100%}
+.gm-art canvas{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:100%}
+@supports not (aspect-ratio:1){.gm-art::before{content:"";display:block;padding-top:100%}}
 .gm-card.is-loading .gm-art canvas{opacity:.35}
 .gm-play{position:absolute;right:8px;bottom:8px;display:grid;place-items:center;width:36px;height:36px;color:transparent;font-size:0;background:var(--tan) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='7' viewBox='0 0 7 7' shape-rendering='crispEdges'%3E%3Crect x='0' y='0' width='1' height='1' fill='%231a1033'/%3E%3Crect x='0' y='1' width='3' height='1' fill='%231a1033'/%3E%3Crect x='0' y='2' width='5' height='1' fill='%231a1033'/%3E%3Crect x='0' y='3' width='7' height='1' fill='%231a1033'/%3E%3Crect x='0' y='4' width='5' height='1' fill='%231a1033'/%3E%3Crect x='0' y='5' width='3' height='1' fill='%231a1033'/%3E%3Crect x='0' y='6' width='1' height='1' fill='%231a1033'/%3E%3C/svg%3E") 13px 10px/12px 14px no-repeat;
   box-shadow:inset -3px -3px 0 #d4b55a,inset 3px 3px 0 #fff7cf,0 0 0 3px var(--ink-0)}
