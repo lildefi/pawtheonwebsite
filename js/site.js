@@ -23,6 +23,21 @@
     window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
   }
 
+
+  // ---- Always open at the very top (no restored scroll, no stale #section from a reload or shared link)
+  (function () {
+    try { if ("scrollRestoration" in history) history.scrollRestoration = "manual"; } catch (e) {}
+    var nav = (performance.getEntriesByType && performance.getEntriesByType("navigation")[0]) || {};
+    var internal = document.referrer && document.referrer.indexOf(location.origin) === 0;
+    var keepHash = location.hash && nav.type === "navigate" && internal;
+    var toTop = function () { window.scrollTo(0, 0); };
+    if (!keepHash) {
+      if (location.hash) { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
+      toTop(); window.addEventListener("load", toTop);
+      window.addEventListener("pageshow", function (ev) { if (ev.persisted) toTop(); });
+    }
+  })();
+
   // ---- Starfield (static positions, CSS twinkle that switches off for reduced motion)
   var sky = document.querySelector(".stars");
   if (sky) {
