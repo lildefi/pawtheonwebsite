@@ -30,6 +30,16 @@
 "ms": 1600
 },
 {
+"id": "chad-dog",
+"title": "Chad",
+"library": "chad-dog",
+"nf": 13,
+"w": 1080,
+"h": 1080,
+"np": 1,
+"ms": 1300
+},
+{
 "id": "book",
 "title": "Book",
 "library": "Book",
@@ -648,5 +658,65 @@
 "h": 1080,
 "np": 14,
 "ms": 1400
+},
+{
+"id": "surise-chair",
+"title": "Sunrise Chair",
+"library": "surise-chair",
+"nf": 28,
+"w": 1080,
+"h": 1080,
+"np": 27,
+"ms": 2800
+},
+{
+"id": "vibing",
+"title": "Vibing",
+"library": "vibing",
+"nf": 16,
+"w": 1080,
+"h": 1080,
+"np": 10,
+"ms": 3200
+},
+{
+"id": "startergameboy",
+"title": "Handheld",
+"library": "startergameboy",
+"nf": 8,
+"w": 1080,
+"h": 1080,
+"np": 5,
+"ms": 800
+},
+{
+"id": "shopping-cart",
+"title": "Shopping Cart",
+"library": "shopping-cart",
+"nf": 7,
+"w": 1080,
+"h": 1080,
+"np": 7,
+"ms": 700
+},
+{
+"id": "vegas-snapshot-camera",
+"title": "Snapshot Camera",
+"library": "vegas-snapshot-camera",
+"nf": 25,
+"w": 1080,
+"h": 1080,
+"np": 22,
+"ms": 2500
+},
+{
+"id": "dogod",
+"title": "Cloud Throne",
+"library": "dogod",
+"nf": 13,
+"w": 1080,
+"h": 1080,
+"np": 5,
+"ms": 1300
 }
 ]
