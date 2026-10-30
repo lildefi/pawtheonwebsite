@@ -559,3 +559,6 @@ select option,select optgroup{background:var(--night-2);color:var(--text)}
 }
 /* phones: the narrower moon divider */
 @media (max-width:520px){.flourish,.site-footer,.prevnext{background-image:url("../images/divider-moons-sm.png");background-size:354px 27px}.flourish{max-width:354px}}
+
+/* banner page: centred text, headings, labels and controls (desktop and phones) */
+.page-banner .page-hero{text-align:center}.page-banner .page-hero .lead{margin-left:auto;margin-right:auto}.page-banner .banner-actions{justify-content:center;text-align:center}.page-banner .ctl-h{justify-content:center;text-align:center}.page-banner .ctl > label,.page-banner .ctl > legend{text-align:center}.page-banner .ctl input[type=text]{text-align:center}.page-banner .switch{width:fit-content;max-width:100%;margin-left:auto;margin-right:auto}
