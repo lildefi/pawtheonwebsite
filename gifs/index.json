@@ -598,5 +598,55 @@
 "h": 1080,
 "np": 4,
 "ms": 1900
+},
+{
+"id": "moneybag",
+"title": "Money Bag",
+"library": "moneybag",
+"nf": 20,
+"w": 1080,
+"h": 1080,
+"np": 20,
+"ms": 4000
+},
+{
+"id": "ddradio3",
+"title": "Radio",
+"library": "ddradio3",
+"nf": 8,
+"w": 1000,
+"h": 1000,
+"np": 5,
+"ms": 800
+},
+{
+"id": "rocket",
+"title": "Rocket",
+"library": "rocket",
+"nf": 6,
+"w": 1000,
+"h": 1000,
+"np": 6,
+"ms": 600
+},
+{
+"id": "firepit",
+"title": "Firepit",
+"library": "firepit",
+"nf": 12,
+"w": 1080,
+"h": 1080,
+"np": 6,
+"ms": 1200
+},
+{
+"id": "surfing",
+"title": "Surfing",
+"library": "surfing",
+"nf": 14,
+"w": 1080,
+"h": 1080,
+"np": 14,
+"ms": 1400
 }
 ]
