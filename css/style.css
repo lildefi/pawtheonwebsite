@@ -447,7 +447,7 @@ select option,select optgroup{background:var(--night-2);color:var(--text)}
 .ctl-h + *{clear:both}
 .step{display:grid;place-items:center;width:32px;height:32px;font:700 16px/1 var(--display);color:var(--ink-0);background:var(--tan);box-shadow:inset -3px -3px 0 #d4b55a,inset 3px 3px 0 #fff7cf,0 0 0 3px var(--ink-0)}
 .ctl{display:flex;flex-direction:column;gap:6px;border:0;margin:0;padding:0;min-width:0}
-.ctl > label,.ctl > legend{color:var(--muted);padding:0;margin-bottom:6px}
+.ctl > label,.ctl > legend,.ctl > .ctl-lab{color:var(--muted);padding:0;margin-bottom:6px}
 .seg{display:inline-grid;grid-template-columns:1fr 1fr;padding:4px;background:var(--ink-0);gap:4px}
 .seg-opt{position:relative;cursor:pointer}
 .seg-opt input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
@@ -561,4 +561,6 @@ select option,select optgroup{background:var(--night-2);color:var(--text)}
 @media (max-width:520px){.flourish,.site-footer,.prevnext{background-image:url("../images/divider-moons-sm.png");background-size:354px 27px}.flourish{max-width:354px}}
 
 /* banner page: centred text, headings, labels and controls (desktop and phones) */
-.page-banner .page-hero{text-align:center}.page-banner .page-hero .lead{margin-left:auto;margin-right:auto}.page-banner .banner-actions{justify-content:center;text-align:center}.page-banner .ctl-h{justify-content:center;text-align:center}.page-banner .ctl > label,.page-banner .ctl > legend{text-align:center}.page-banner .ctl input[type=text]{text-align:center}.page-banner .switch{width:fit-content;max-width:100%;margin-left:auto;margin-right:auto}
+.page-banner .page-hero{text-align:center}.page-banner .page-hero .lead{margin-left:auto;margin-right:auto}.page-banner .banner-actions{justify-content:center;text-align:center}.page-banner .ctl-h{justify-content:center;text-align:center}.page-banner .ctl > label,.page-banner .ctl > legend,.page-banner .ctl > .ctl-lab{text-align:center}.page-banner .ctl input[type=text]{text-align:center}.page-banner .switch{width:fit-content;max-width:100%;margin-left:auto;margin-right:auto}
+/* phones/tablets (stacked layout): the preview scrolls with the page so it never covers the box headings */
+@media (max-width:820px){.banner-preview{position:relative;top:auto}}

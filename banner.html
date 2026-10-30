@@ -10,7 +10,7 @@
 <meta name="description" content="The Order of 86: the wizard-hat dogs who keep the seven moons of Pawtheon.">
 <link rel="icon" href="favicon.svg?v=3" type="image/svg+xml"><link rel="icon" href="favicon-32.png?v=3" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="apple-touch-icon.png?v=3">
 <link rel="preload" href="fonts/pixelify-sans-var.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/silkscreen-bold.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="css/style.css?v=48">
+<link rel="stylesheet" href="css/style.css?v=49">
 </head>
 <body class="page-banner">
 <a class="skip" href="#main">Skip to content</a>
@@ -55,27 +55,27 @@
         <label for="b-handle">Handle</label>
         <input id="b-handle" type="text" value="@wizard" maxlength="30" autocomplete="off" spellcheck="false" autocapitalize="off">
       </div>
-      <fieldset class="ctl">
-        <legend>Text colour</legend>
+      <div class="ctl" role="radiogroup" aria-labelledby="b-ink-l">
+        <span class="ctl-lab" id="b-ink-l">Text colour</span>
         <div class="seg">
           <label class="seg-opt"><input type="radio" name="b-ink" value="#000000" checked><span><i style="background:#000"></i>Black</span></label>
           <label class="seg-opt"><input type="radio" name="b-ink" value="#ffffff"><span><i style="background:#fff"></i>White</span></label>
         </div>
-      </fieldset>
+      </div>
     </div>
-    <fieldset class="ctl-group">
-      <legend class="ctl-h"><span class="step">2</span>Wizard hat</legend>
+    <div class="ctl-group" role="group" aria-labelledby="b-h2">
+      <h2 class="ctl-h" id="b-h2"><span class="step">2</span>Wizard hat</h2>
       <div id="b-hats" class="swatches swatches-hats" role="group" aria-label="Hat colour"></div>
-    </fieldset>
-    <fieldset class="ctl-group">
-      <legend class="ctl-h"><span class="step">3</span>Background <span class="muted small">Doginal Dogs colours</span></legend>
+    </div>
+    <div class="ctl-group" role="group" aria-labelledby="b-h3">
+      <h2 class="ctl-h" id="b-h3"><span class="step">3</span>Background <span class="muted small">Doginal Dogs colours</span></h2>
       <div id="b-bgs" class="swatches swatches-bgs" role="group" aria-label="Background colour"></div>
-    </fieldset>
-    <fieldset class="ctl-group">
-      <legend class="ctl-h"><span class="step">4</span>Extras</legend>
+    </div>
+    <div class="ctl-group" role="group" aria-labelledby="b-h4">
+      <h2 class="ctl-h" id="b-h4"><span class="step">4</span>Extras</h2>
       <label class="switch"><input id="b-badge" type="checkbox" checked><span class="track" aria-hidden="true"></span>Verified badge</label>
       <label class="switch"><input id="b-safe" type="checkbox"><span class="track" aria-hidden="true"></span>Safe-zone overlay <span class="muted small">(preview only)</span></label>
-    </fieldset>
+    </div>
   </section>
 </div>
 </main>
@@ -85,7 +85,7 @@
     <p>Keepers of the seven moons. Wizard dog art from the Doginal Dogs collection.</p>
   </div>
 </footer>
-<script src="js/site.js?v=48" defer></script>
-<script src="js/banner.js?v=48" defer></script>
+<script src="js/site.js?v=49" defer></script>
+<script src="js/banner.js?v=49" defer></script>
 </body>
 </html>
