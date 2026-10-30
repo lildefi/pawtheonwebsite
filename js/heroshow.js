@@ -7,18 +7,28 @@
   for (var i = list.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = list[i]; list[i] = list[j]; list[j] = t; }
   var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   var cur = 0, on = 0, timer = null, delay = reduce ? 6000 : 3200;
+  // fill the arch window behind the dog with that dog's own background colour (top-left pixel), so the picture fills the arch
+  var win = box.querySelector(".hs-win"), cv = document.createElement("canvas"); cv.width = cv.height = 1;
+  function tint(el) {
+    try {
+      var c = cv.getContext("2d"); c.clearRect(0, 0, 1, 1); c.drawImage(el, 0, 0, 1, 1, 0, 0, 1, 1);
+      var d = c.getImageData(0, 0, 1, 1).data; if (win && d[3]) win.style.setProperty("--hs-bg", "rgb(" + d[0] + "," + d[1] + "," + d[2] + ")");
+    } catch (e) {}
+  }
   function label(w) { return (window.wizardName ? wizardName(w) : "Dog #" + w.number); }
   function show(w, el) {
     el.alt = label(w); cap.textContent = label(w) + (w.title || w.name ? " \u00b7 #" + w.number : "");
     box.href = "wizard.html?dog=" + w.number; box.setAttribute("aria-label", "Meet " + label(w));
   }
   // first slide
+  imgs[0].onload = function () { imgs[0].onload = null; tint(imgs[0]); };
   imgs[0].src = list[0].image; show(list[0], imgs[0]);
+  if (imgs[0].complete && imgs[0].naturalWidth) tint(imgs[0]);
   function next() {
     var n = (cur + 1) % list.length, off = 1 - on, el = imgs[off], w = list[n];
     var go = function () {
       el.onload = null;
-      imgs[on].classList.remove("is-on"); el.classList.add("is-on"); show(w, el);
+      imgs[on].classList.remove("is-on"); el.classList.add("is-on"); show(w, el); tint(el);
       on = off; cur = n; timer = setTimeout(next, delay);
     };
     el.onload = go; el.onerror = function () { cur = n; timer = setTimeout(next, 200); };
