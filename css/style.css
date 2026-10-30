@@ -511,3 +511,6 @@ select option{background:var(--night-2);color:var(--text)}
 .hs-cap:empty{display:none}
 @media (prefers-reduced-motion:reduce){.hero-show .hs-img{transition:opacity .3s}}
 @media (max-width:900px){.hs-cap{font-size:.74rem;white-space:normal;width:max-content;max-width:88%;text-align:center;bottom:8px;line-height:1.25}}
+/* Wanderer hat logo: pixel art, with a soft light rim so the black outline reads on the night sky */
+.brand .logo{image-rendering:pixelated;filter:drop-shadow(0 0 1px rgba(243,230,196,.55))}
+.brand .logo{width:44px;height:44px}.brand-sm .logo{width:34px;height:34px}
