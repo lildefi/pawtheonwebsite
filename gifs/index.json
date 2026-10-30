@@ -548,5 +548,55 @@
 "h": 1080,
 "np": 4,
 "ms": 600
+},
+{
+"id": "superdog",
+"title": "Superdog",
+"library": "superdog",
+"nf": 12,
+"w": 1080,
+"h": 1080,
+"np": 7,
+"ms": 1200
+},
+{
+"id": "dog-kong",
+"title": "Skyscraper",
+"library": "dog-kong",
+"nf": 18,
+"w": 1080,
+"h": 1080,
+"np": 17,
+"ms": 1800
+},
+{
+"id": "parrot-pirate",
+"title": "Pirate",
+"library": "parrot-pirate",
+"nf": 12,
+"w": 1080,
+"h": 1080,
+"np": 4,
+"ms": 1200
+},
+{
+"id": "red2green",
+"title": "Laser Eyes",
+"library": "red2green",
+"nf": 24,
+"w": 1080,
+"h": 1080,
+"np": 11,
+"ms": 4400
+},
+{
+"id": "magicianhat",
+"title": "Magic Hat",
+"library": "magicianhat",
+"nf": 19,
+"w": 1080,
+"h": 1080,
+"np": 4,
+"ms": 1900
 }
 ]
