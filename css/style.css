@@ -484,3 +484,18 @@ select option{background:var(--night-2);color:var(--text)}
 .hero-hat{width:72%;height:auto;filter:drop-shadow(0 0 24px rgba(232,194,122,.35));animation:hatfloat 6s ease-in-out infinite}
 @keyframes hatfloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-8px) rotate(2deg)}}
 @media (prefers-reduced-motion:reduce){.hero-hat{animation:none}}
+
+/* ---------- Smooth scrolling: keep the fixed sky on its own cheap layer ---------- */
+.sky{transform:translateZ(0);contain:strict}
+.stars span{box-shadow:none;will-change:opacity}
+@media (max-width:900px),(hover:none){
+  .motes{display:none}
+  .stars span{animation:none!important}
+  .grid.animate .card{animation:none}
+  .card-shell,.starter,.feature,.howl{transform:none!important}
+  .card,.starter,.feature,.pn{box-shadow:0 8px 18px -10px rgba(0,0,0,.7)!important;transition:none}
+  .js .reveal{transform:none;transition:opacity .4s ease}
+  .js .reveal.in{transform:none}
+  .phase{filter:none}
+  .hero-hat{filter:none}
+}

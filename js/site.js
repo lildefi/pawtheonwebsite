@@ -26,11 +26,11 @@
   // ---- Starfield (static positions, CSS twinkle that switches off for reduced motion)
   var sky = document.querySelector(".stars");
   if (sky) {
-    var html = "", count = window.innerWidth < 600 ? 45 : 90;
+    var html = "", count = window.innerWidth < 600 ? 36 : 80;
     for (var s = 0; s < count; s++) {
       var size = Math.random() < 0.12 ? 3 : Math.random() < 0.5 ? 2 : 1;
       html += '<span style="left:' + (Math.random() * 100).toFixed(2) + "%;top:" + (Math.random() * 100).toFixed(2) +
-        "%;width:" + size + "px;height:" + size + "px;animation-delay:" + (Math.random() * 7).toFixed(2) + "s;opacity:" + (0.25 + Math.random() * 0.65).toFixed(2) + '"></span>';
+        "%;width:" + size + "px;height:" + size + "px;" + (s % 6 === 0 ? "" : "animation:none;") + "animation-delay:" + (Math.random() * 7).toFixed(2) + "s;opacity:" + (0.25 + Math.random() * 0.65).toFixed(2) + '"></span>';
     }
     sky.innerHTML = html;
   }
