@@ -518,5 +518,35 @@
 "h": 1080,
 "np": 10,
 "ms": 1000
+},
+{
+"id": "green-candle",
+"title": "Candle",
+"library": "green-candle",
+"nf": 20,
+"w": 1080,
+"h": 1080,
+"np": 10,
+"ms": 2000
+},
+{
+"id": "chartup",
+"title": "Chart",
+"library": "chartup",
+"nf": 24,
+"w": 1080,
+"h": 1080,
+"np": 19,
+"ms": 2400
+},
+{
+"id": "treadmill",
+"title": "Treadmill",
+"library": "treadmill",
+"nf": 6,
+"w": 1080,
+"h": 1080,
+"np": 4,
+"ms": 600
 }
 ]
