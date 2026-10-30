@@ -412,3 +412,25 @@ select option{background:var(--surface);color:var(--text)}
 .detail-lore p:last-child{margin-bottom:0}
 .detail-lore em{color:var(--gold);font-style:italic}
 .detail-text .detail-lore + .h3{margin-top:var(--s-6)}
+/* ---------- Lore: the Howls ---------- */
+.howls{list-style:none;margin:0 0 var(--s-8);padding:0;display:grid;gap:var(--s-4)}
+.howl{display:flex;gap:var(--s-5);align-items:flex-start;padding:var(--s-5);border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface)}
+.howl-n{flex:0 0 auto;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-size:1.4rem;border:1px solid var(--line-2);color:var(--gold)}
+.howl-ch{margin:0;font-family:var(--head);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+.howl-t{margin:4px 0 0;font-family:var(--head);font-size:clamp(1.25rem,3vw,1.7rem);letter-spacing:-.01em}
+.howl-actions{display:flex;flex-wrap:wrap;gap:var(--s-3);margin-top:var(--s-4)}
+.howl.is-open{border-color:var(--line-2);background:linear-gradient(135deg,rgba(246,212,124,.10),rgba(185,148,255,.08)),var(--surface)}
+.howl-tag{display:inline-block;margin-top:var(--s-3);padding:4px 12px;border-radius:999px;font-size:.78rem;letter-spacing:.06em;border:1px solid var(--line-2);color:var(--muted)}
+.howl.is-soon .howl-tag{color:var(--gold);border-color:rgba(246,212,124,.45)}
+.howl.is-locked{opacity:.4;filter:grayscale(1);pointer-events:none;user-select:none}
+.howl.is-locked .howl-n{color:var(--faint)}
+.howl-story{margin:0 auto var(--s-8)}
+.howl-story h3{font-family:var(--head);font-size:clamp(1.15rem,2.4vw,1.4rem);margin:var(--s-6) 0 var(--s-3);color:var(--gold)}
+.howl-source{font-style:italic;color:var(--muted)}
+.howl-rule{border:0;border-top:1px solid var(--line);margin:var(--s-6) 0}
+.howl-next{display:flex;flex-wrap:wrap;gap:var(--s-3);margin-top:var(--s-6)}
+@media (max-width:560px){.howl{padding:var(--s-4);gap:var(--s-4)}.howl-n{width:42px;height:42px;font-size:1.1rem}}
+.brand-text{display:flex;flex-direction:column;line-height:1.05}
+.brand-name{font-size:1.15rem;letter-spacing:.04em}
+.brand-sub{font-family:var(--sans);text-transform:none;font-size:.7rem;letter-spacing:.02em;color:var(--muted);margin-top:3px}
+.brand-sm .brand-name{font-size:1rem}
