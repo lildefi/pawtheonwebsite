@@ -83,6 +83,26 @@
   }
   function traitText(w) { return w.traits.map(function (t) { return t[1]; }).join(" "); }
 
+  // Orders (moon colours match the lore page) and current holders (X handle only, from js/holders.js).
+  var ORDER_C = { Flame: "#ff7a45", Radiant: "#ffd65a", Deep: "#3fb5ff", Wild: "#5fe08a", Arcane: "#a46bff", Dream: "#ff8fc8", Wanderer: "#dfe3ea" };
+  function orderLabel(w) { return w.order ? (w.order === "Wanderer" ? "The Wanderer" : w.order + " Order") : ""; }
+  function orderChip(w, cls) {
+    return w.order ? '<span class="order-chip ' + (cls || "") + '" style="--oc:' + (ORDER_C[w.order] || "#b994ff") + '">' + esc(orderLabel(w)) + "</span>" : "";
+  }
+  function holder(w) {
+    var h = window.HOLDERS && window.HOLDERS[String(w.number)];
+    return h && /^[A-Za-z0-9_]{1,15}$/.test(h) ? h : null;
+  }
+  function holderLink(h, cls) {
+    return '<a class="' + cls + '" href="https://x.com/' + encodeURIComponent(h) + '" target="_blank" rel="noopener noreferrer">@' + esc(h) + "</a>";
+  }
+  // Lore: paragraphs split by a blank line; *x* is emphasis.
+  function loreHtml(t) {
+    return String(t).split(/\n\s*\n/).map(function (para) {
+      return "<p>" + esc(para).replace(/\*([^*\n]+)\*/g, "<em>$1</em>") + "</p>";
+    }).join("");
+  }
+
   // ---- Home gallery
   var grid = document.getElementById("wizard-grid");
   if (grid && window.WIZARDS) {
@@ -93,12 +113,23 @@
     if (filterSel) {
       var pats = {};
       WIZARDS.forEach(function (w) { var p = trait(w, "Fur Pattern"); if (p) pats[p] = (pats[p] || 0) + 1; });
-      Object.keys(pats).sort().forEach(function (p) {
-        var o = document.createElement("option"); o.value = p; o.textContent = p + " (" + pats[p] + ")"; filterSel.appendChild(o);
+      var ords = {};
+      WIZARDS.forEach(function (w) { if (w.order) ords[w.order] = (ords[w.order] || 0) + 1; });
+      var gO = document.createElement("optgroup"); gO.label = "Order";
+      Object.keys(ords).sort().forEach(function (k) {
+        var o = document.createElement("option"); o.value = "order:" + k; o.textContent = orderLabel({ order: k }) + " (" + ords[k] + ")"; gO.appendChild(o);
       });
+      if (gO.children.length) filterSel.appendChild(gO);
+      var gP = document.createElement("optgroup"); gP.label = "Fur pattern";
+      Object.keys(pats).sort().forEach(function (p) {
+        var o = document.createElement("option"); o.value = p; o.textContent = p + " (" + pats[p] + ")"; gP.appendChild(o);
+      });
+      filterSel.appendChild(gP);
     }
     var cards = {};
     WIZARDS.forEach(function (w, i) {
+      var shell = document.createElement("div");
+      shell.className = "card-shell";
       var a = document.createElement("a");
       a.className = "card" + (w.title ? " card-titled" : "") + (i === 0 ? " card-wanderer" : "");
       a.href = "wizard.html?dog=" + w.number;
@@ -113,18 +144,25 @@
         '<span class="card-body">' +
           '<span class="card-name">' + (w.title ? esc(w.title) : "Dog #" + w.number) + "</span>" +
           '<span class="card-tag">' + esc(tags) + "</span>" +
+          orderChip(w, "card-order") +
         "</span>";
-      cards[w.number] = a;
+      shell.appendChild(a);
+      var h = holder(w), hl = document.createElement("div");
+      hl.className = "card-holder" + (h ? "" : " card-holder-none");
+      hl.innerHTML = h ? '<span class="k">Held by</span> ' + holderLink(h, "holder-link") : '<span class="k">Holder not linked</span>';
+      shell.appendChild(hl);
+      cards[w.number] = shell;
     });
 
     var render = function () {
       var q = (search ? search.value : "").trim().toLowerCase().replace(/^#/, "");
       var pat = filterSel ? filterSel.value : "", sort = sortSel ? sortSel.value : "order";
       var list = WIZARDS.filter(function (w) {
-        if (pat && trait(w, "Fur Pattern") !== pat) return false;
+        if (pat && pat.indexOf("order:") === 0) { if (w.order !== pat.slice(6)) return false; }
+        else if (pat && trait(w, "Fur Pattern") !== pat) return false;
         if (!q) return true;
         if (/^\d+$/.test(q)) return String(w.number).indexOf(q) === 0 || String(w.number) === q;
-        var hay = ("dog " + w.number + " " + (w.title || "") + " " + (w.name || "") + " " + traitText(w)).toLowerCase();
+        var hay = ("dog " + w.number + " " + (w.title || "") + " " + (w.name || "") + " " + (w.order || "") + " " + (w.realm || "") + " " + (holder(w) ? "@" + holder(w) : "") + " " + traitText(w)).toLowerCase();
         return q.split(/\s+/).every(function (t) { return hay.indexOf(t) >= 0; });
       });
       var big = 1e9;
@@ -162,6 +200,8 @@
     var w = WIZARDS[i], L = WIZARDS.length;
     var prev = WIZARDS[(i - 1 + L) % L], next = WIZARDS[(i + 1) % L];
     document.title = "Dog #" + w.number + (w.title ? " · " + w.title : "") + " · The Order of 86";
+    var md = document.querySelector('meta[name="description"]');
+    if (md && w.lore) md.setAttribute("content", (w.title ? w.title + ": " : "") + w.lore.split(/\n/)[0].replace(/\*/g, "").slice(0, 150));
     detail.style.setProperty("--bgc", bgColor(w));
     var tiles = w.traits.map(function (t) {
       return '<div class="trait"><dt>' + esc(t[0]) + "</dt><dd>" + esc(t[1]) + "</dd></div>";
@@ -179,15 +219,20 @@
           '<p class="eyebrow">Wizard ' + (i + 1) + " of " + L + (i === 0 ? " &middot; Unaffiliated" : "") + "</p>" +
           '<h1 class="display display-sm">Dog #' + w.number + "</h1>" +
           (w.title ? '<p class="detail-title">' + esc(w.title) + "</p>" : "") +
+          (w.epithet ? '<p class="detail-epithet">' + esc(w.epithet) + "</p>" : "") +
+          (w.order || w.realm ? '<p class="detail-meta">' + orderChip(w) + (w.realm ? '<span class="realm-chip">' + esc(w.realm) + "</span>" : "") + "</p>" : "") +
           (w.name ? '<p class="detail-title">' + esc(w.name) + "</p>" : "") +
           '<dl class="facts">' +
             '<div><dt>Dog number</dt><dd>#' + w.number + "</dd></div>" +
             (w.rank ? '<div><dt>Rarity rank</dt><dd>' + fmt(w.rank) + ' <small>/ 10,000</small></dd></div>' : "") +
             '<div><dt>Seat</dt><dd>' + (i + 1) + ' <small>/ ' + L + "</small></dd></div>" +
           "</dl>" +
-          '<p class="detail-lore">' + esc(w.lore || "This wizard's story has not been written into the archive yet. When leadership adds it, it will appear here.") + "</p>" +
+          '<div class="holder-row"><span class="k">Current holder</span> ' + (holder(w) ? holderLink(holder(w), "holder-link holder-link-lg") : '<span class="muted">Holder not linked</span>') + "</div>" +
+          (w.summary ? '<p class="detail-summary">' + esc(w.summary) + "</p>" : "") +
+          '<h2 class="h3">Biography</h2>' +
+          '<div class="detail-lore">' + (w.lore ? loreHtml(w.lore) : "<p>This wizard's story has not been written into the archive yet. When leadership adds it, it will appear here.</p>") + "</div>" +
           '<h2 class="h3">Traits</h2><dl class="traits">' + tiles + "</dl>" +
-          '<p class="muted small">Rarity rank is the Doginal Dogs market rank: 1 is the rarest of 10,000.</p>' +
+          '<p class="muted small">Rarity rank is the Doginal Dogs market rank: 1 is the rarest of 10,000. The holder is the X account linked to this dog on market.doginaldogs.com' + (window.HOLDERS_UPDATED ? " (checked " + esc(window.HOLDERS_UPDATED) + ")" : "") + ".</p>" +
         "</div>" +
       "</div>" +
       '<nav class="prevnext" aria-label="Wizard navigation">' + navCard(prev, "prev") +

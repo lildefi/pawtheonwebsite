@@ -4,7 +4,7 @@
  * then the frames are encoded with js/gifenc.js. Nothing is uploaded. */
 (function () {
   "use strict";
-  var BASE = "gifs/", V = "9";
+  var BASE = "gifs/", V = "10";
   var $ = function (s, el) { return (el || document).querySelector(s); };
   var state = { dog: null, mode: "dog", index: [], dogs: {}, scenes: {}, open: null, timer: 0, token: 0 };
 
@@ -13,18 +13,36 @@
   function img(u) {
     return new Promise(function (ok, bad) { var i = new Image(); i.onload = function () { ok(i); }; i.onerror = bad; i.src = BASE + u + "?v=" + V; });
   }
+  /* Memory-light loading (phones): scene.json is cached; decoded plates are kept only for the scene being previewed. */
+  var jsonCache = {}, plateKeep = { id: null, plates: null };
+  function sceneJSON(id) { return jsonCache[id] || (jsonCache[id] = json(id + "/scene.json")); }
+  function decode(J, ims) {
+    var c = document.createElement("canvas"); c.width = J.w; c.height = J.h;
+    var x = c.getContext("2d", { willReadFrequently: true });
+    var out = ims.map(function (im) { x.clearRect(0, 0, J.w, J.h); x.drawImage(im, 0, 0); return x.getImageData(0, 0, J.w, J.h).data; });
+    c.width = c.height = 1; return out;
+  }
+  /* full scene (all plates) for the preview; replaces whatever was kept before */
   function loadScene(id) {
-    if (state.scenes[id]) return state.scenes[id];
-    state.scenes[id] = json(id + "/scene.json").then(function (J) {
-      var jobs = []; for (var k = 0; k < J.np; k++) jobs.push(img(id + "/p" + k + ".png"));
+    return sceneJSON(id).then(function (J0) {
+      if (plateKeep.id === id) return withPlates(J0, plateKeep.plates);
+      plateKeep = { id: null, plates: null };
+      var jobs = []; for (var k = 0; k < J0.np; k++) jobs.push(img(id + "/p" + k + ".png"));
       return Promise.all(jobs).then(function (ims) {
-        var c = document.createElement("canvas"); c.width = J.w; c.height = J.h;
-        var x = c.getContext("2d", { willReadFrequently: true });
-        J.plates = ims.map(function (im) { x.clearRect(0, 0, J.w, J.h); x.drawImage(im, 0, 0); return x.getImageData(0, 0, J.w, J.h).data; });
-        return J;
+        var pl = decode(J0, ims); plateKeep = { id: id, plates: pl }; return withPlates(J0, pl);
       });
     });
-    return state.scenes[id];
+  }
+  function withPlates(J0, pl) { var J = Object.create(J0); J.plates = pl; return J; }
+  /* just frame 0's plate, for a thumbnail; nothing is kept afterwards */
+  function loadThumb(id) {
+    return sceneJSON(id).then(function (J0) {
+      var p0 = J0.frames[0].p;
+      if (plateKeep.id === id) { var J = withPlates(J0, []); J.plates[p0] = plateKeep.plates[p0]; return J; }
+      return img(id + "/p" + p0 + ".png").then(function (im) {
+        var J = withPlates(J0, []); J.plates[p0] = decode(J0, [im])[0]; return J;
+      });
+    });
   }
   /* background family -> the wizard's PFP background, keeping each shade's lightness (same rule as the build) */
   function bgMap(J, dog) {
@@ -75,11 +93,13 @@
     }
     return d;
   }
+  var bigCv = null;
   function paint(canvas, J, data) {
-    var big = document.createElement("canvas"); big.width = J.w; big.height = J.h;
-    big.getContext("2d").putImageData(new ImageData(data, J.w, J.h), 0, 0);
+    if (!bigCv) bigCv = document.createElement("canvas");
+    if (bigCv.width !== J.w || bigCv.height !== J.h) { bigCv.width = J.w; bigCv.height = J.h; }
+    bigCv.getContext("2d").putImageData(new ImageData(data, J.w, J.h), 0, 0);
     var x = canvas.getContext("2d"); x.imageSmoothingEnabled = false;
-    x.clearRect(0, 0, canvas.width, canvas.height); x.drawImage(big, 0, 0, canvas.width, canvas.height);
+    x.clearRect(0, 0, canvas.width, canvas.height); x.drawImage(bigCv, 0, 0, canvas.width, canvas.height);
   }
   function wizardName0(w) { return w.starter ? w.name : (window.wizardName ? window.wizardName(w) : "Dog #" + w.number); }
   /* everyone the picker offers: the 9 starter wizards first, then the Order's 86 */
@@ -132,16 +152,30 @@
     if (state.open) openPreview(state.open);
   }
   /* ---------- grid ---------- */
+  /* thumbnails render one at a time, only when their card scrolls near the screen */
+  var queue = [], busy = false, seen = {}, io = null;
+  function pump() {
+    if (busy || !queue.length) return;
+    busy = true;
+    var job = queue.shift();
+    loadThumb(job.id).then(function (J) {
+      if (job.tok === state.token) { paint(job.cv, J, compose(J, state.dogs[state.dog], state.mode, 0)); job.card.classList.remove("is-loading"); }
+    }).catch(function () { job.card.classList.add("is-error"); })
+      .then(function () { busy = false; setTimeout(pump, 0); });
+  }
+  function want(card) {
+    var id = card.dataset.scene;
+    if (seen[id] === state.token) return; seen[id] = state.token;
+    queue = queue.filter(function (q) { return q.id !== id; });
+    queue.push({ id: id, card: card, cv: $("canvas", card), tok: state.token }); pump();
+  }
   function renderGrid() {
-    var tok = ++state.token, dog = state.dogs[state.dog], mode = state.mode;
-    state.index.forEach(function (s) {
-      var card = $('[data-scene="' + s.id + '"]'), cv = $("canvas", card);
-      card.classList.add("is-loading");
-      loadScene(s.id).then(function (J) {
-        if (tok !== state.token) return;
-        paint(cv, J, compose(J, dog, mode, 0)); card.classList.remove("is-loading");
-      }).catch(function () { card.classList.add("is-error"); });
-    });
+    ++state.token; queue = []; seen = {};
+    var cards = document.querySelectorAll(".gm-card");
+    cards.forEach(function (c) { c.classList.add("is-loading"); });
+    if (!("IntersectionObserver" in window)) { cards.forEach(want); return; }
+    if (!io) io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) want(e.target); }); }, { rootMargin: "400px 0px" });
+    cards.forEach(function (c) { io.unobserve(c); io.observe(c); });
   }
   function buildCards() {
     var grid = $("#gm-grid");
@@ -164,23 +198,28 @@
     var dog = state.dogs[state.dog], mode = state.mode, tok = state.token;
     loadScene(id).then(function (J) {
       if (state.open !== id) return;
-      var frames = J.frames.map(function (_, f) { return compose(J, dog, mode, f); });
-      state.cur = { J: J, frames: frames, id: id, n: state.dog, mode: mode };
+      /* frames are composed as they play, so only one is in memory at a time */
+      state.cur = { J: J, id: id, n: state.dog, mode: mode, dog: dog };
       var cv = $("#gm-canvas"), k = 0;
       (function tick() {
         if (state.open !== id || !dlg.open) return;
-        paint(cv, J, frames[k]); var d = frameDelay(J.durs[k]); k = (k + 1) % frames.length;
+        paint(cv, J, compose(J, dog, mode, k)); var d = frameDelay(J.durs[k]); k = (k + 1) % J.frames.length;
         state.timer = setTimeout(tick, d);
       })();
       $("#gm-d-status").textContent = J.nf + " frames, " + J.w + "\u00d7" + J.h + (mode === "dog" ? ", your dog's background" : ", tan background");
       $("#gm-download").disabled = false;
-    });
+    }).catch(function () { $("#gm-d-status").textContent = "Couldn't load this GIF. Try again."; });
   }
   function download() {
     var c = state.cur; if (!c) return;
     var btn = $("#gm-download"), st = $("#gm-d-status"); btn.disabled = true; st.textContent = "Building your GIF\u2026";
     setTimeout(function () {
-      var bytes = encodeGIF(c.frames.map(function (d, f) { return { data: d, delay: c.J.durs[f] }; }), { width: c.J.w, height: c.J.h, loop: c.J.loop });
+      var lazy = c.J.frames.map(function (_, f) {
+        var o = { delay: c.J.durs[f] };
+        Object.defineProperty(o, "data", { get: function () { return compose(c.J, c.dog, c.mode, f); } });
+        return o;
+      });
+      var bytes = encodeGIF(lazy, { width: c.J.w, height: c.J.h, loop: c.J.loop });
       var url = URL.createObjectURL(new Blob([bytes], { type: "image/gif" }));
       var a = document.createElement("a"); a.href = url; a.download = "order86-" + c.id + "-" + c.n + ".gif";
       document.body.appendChild(a); a.click(); a.remove();
