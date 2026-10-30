@@ -250,6 +250,7 @@ select option,select optgroup{background:var(--night-2);color:var(--text)}
   .stats div,.stats div+div{justify-content:center;padding:8px 6px;background:var(--panel);box-shadow:0 0 0 3px var(--ink-0)}
   .phases{display:none}
   .hero-art{display:none}
+  .hero-copy{text-align:center}.hero-copy .lead{margin-left:auto;margin-right:auto}.hero .kicker{justify-content:center}
   .hero-portrait{position:relative;left:auto;right:auto;top:auto;width:100%}
   .hs-frame,.hs-frame::before,.hs-frame::after,.hs-win{clip-path:none}
   .hs-win{aspect-ratio:1}
