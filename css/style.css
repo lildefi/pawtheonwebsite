@@ -493,3 +493,12 @@ select option{background:var(--night-2);color:var(--text)}
   .js .reveal.in{transform:none}
   .hero-hat{filter:none}
 }
+
+/* moons: higher, rounder arch */
+.phases{top:-15%;left:-6%;right:-6%}
+.phase.ph0{--y:120px}.phase.ph1{--y:52px}.phase.ph2{--y:12px}.phase.ph3{--y:0px}.phase.ph4{--y:12px}.phase.ph5{--y:52px}.phase.ph6{--y:120px}
+@media (max-width:900px){
+  .hero-art{margin-top:56px}
+  .phases{top:-26%;left:-4%;right:-4%}
+  .phase.ph0,.phase.ph6{--y:72px}.phase.ph1,.phase.ph5{--y:30px}.phase.ph2,.phase.ph4{--y:7px}.phase.ph3{--y:0px}
+}
