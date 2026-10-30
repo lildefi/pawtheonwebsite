@@ -4,7 +4,7 @@
  * then the frames are encoded with js/gifenc.js. Nothing is uploaded. */
 (function () {
   "use strict";
-  var BASE = "gifs/", V = "10";
+  var BASE = "gifs/", V = "11";
   var $ = function (s, el) { return (el || document).querySelector(s); };
   var state = { dog: null, mode: "dog", index: [], dogs: {}, scenes: {}, open: null, timer: 0, token: 0 };
 
@@ -56,6 +56,19 @@
     });
     return M;
   }
+  // body texture: the dog's own fur pixel; outline stays black; only the scene's dark shading survives on the base fur
+  function texCol(dog, pal, roles, kind, v, u, ro) {
+    if (ro === 4) return roles[4];
+    var ti = (kind === 5 ? dog.tb : dog.tf).charCodeAt(v * 25 + u) - 48;
+    if (ti === 0) return roles[ro];
+    var col = pal[ti];
+    if (ro === 0 || col[0] !== roles[0][0] || col[1] !== roles[0][1] || col[2] !== roles[0][2]) return col;
+    // the scene's shading on the base fur: the dark shade always; the light/mid roles (paws, belly) only when the
+    // dog's own body fur has that colour (Gary's tan paws stay; a white or green muzzle never paints a grey body)
+    if (ro === 1) return roles[1];
+    if (!dog._tset) { dog._tset = {}; for (var i = 0; i < dog.tf.length; i++) { var k = dog.tf.charCodeAt(i) - 48; if (k) dog._tset[dog.pal[k]] = 1; } }
+    return dog._tset[dog.roles[ro]] ? roles[ro] : col;
+  }
   function compose(J, dog, mode, f) {
     var fr = J.frames[f], src = J.plates[fr.p], d = new Uint8ClampedArray(src), W = J.w;
     if (mode === "dog") {
@@ -70,20 +83,36 @@
     var g = dog.g[fr.st], ops = fr.ops, xs = J.xs, ys = J.ys;
     for (var o = 0; o < ops.length; o += 6) {
       var r = ops[o], cc = ops[o + 1], kind = ops[o + 2], col;
+      if (kind === 8) {
+        // inset portrait (the whole dog scaled into a picture frame): y, x in pixels, 8, v, u, block size
+        var ii = g.charCodeAt(ops[o + 3] * 25 + ops[o + 4]) - 48;
+        if (ii === 0) continue;
+        col = pal[ii];
+        var sz = ops[o + 5];
+        for (var yy = r; yy < r + sz; yy++) {
+          var q = (yy * W + cc) * 4;
+          for (var xx = 0; xx < sz; xx++, q += 4) { d[q] = col[0]; d[q + 1] = col[1]; d[q + 2] = col[2]; d[q + 3] = 255; }
+        }
+        continue;
+      }
       if (kind === 2) col = roles[ops[o + 5]];
+      else if (kind === 7) {
+        // scene prop in the dog's own hat colour (copy of portrait cell v,u), e.g. the broom's bristles
+        var hi = g.charCodeAt(ops[o + 3] * 25 + ops[o + 4]) - 48;
+        if (hi === 0) continue;
+        col = pal[hi];
+      }
       else if (kind >= 5) {
         // body texture: the dog's own torso / fur pixel (outline black; base fur keeps the scene's shading role)
-        var ro = ops[o + 5];
-        if (ro === 4) col = roles[4];
-        else {
-          var ti = (kind === 5 ? dog.tb : dog.tf).charCodeAt(ops[o + 3] * 25 + ops[o + 4]) - 48;
-          if (ti === 0) col = roles[ro];
-          else { col = pal[ti]; if (col[0] === roles[0][0] && col[1] === roles[0][1] && col[2] === roles[0][2]) col = roles[ro]; }
-        }
+        col = texCol(dog, pal, roles, kind, ops[o + 3], ops[o + 4], ops[o + 5]);
       }
       else {
         var pi = g.charCodeAt(ops[o + 3] * 25 + ops[o + 4]) - 48;
-        if (pi === 0) { if (kind === 1) col = roles[ops[o + 5]]; else continue; }
+        if (pi === 0) {
+          if (kind !== 1) continue;
+          // body cell where the portrait is background: the dog's own body fur texture there
+          col = texCol(dog, pal, roles, 6, Math.min(24, Math.max(19, ops[o + 3])), Math.min(22, Math.max(2, ops[o + 4])), ops[o + 5]);
+        }
         else col = pal[pi];
       }
       for (var y = ys[r]; y < ys[r + 1]; y++) {
