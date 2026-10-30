@@ -434,3 +434,16 @@ select option{background:var(--surface);color:var(--text)}
 .brand-name{font-size:1.15rem;letter-spacing:.04em}
 .brand-sub{font-family:var(--sans);text-transform:none;font-size:.7rem;letter-spacing:.02em;color:var(--muted);margin-top:3px}
 .brand-sm .brand-name{font-size:1rem}
+/* ---------- Join the community: starter hats ---------- */
+.join-copy{max-width:640px}
+.starters{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:var(--s-4)}
+.starter{display:flex;flex-direction:column;align-items:center;gap:var(--s-3);padding:var(--s-4);border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);transition:transform .3s var(--ease),border-color .3s}
+.starter:hover{transform:translateY(-3px);border-color:var(--hc)}
+.starter img{width:100%;max-width:160px;height:auto;aspect-ratio:1;border-radius:var(--r);image-rendering:pixelated;box-shadow:0 0 0 2px color-mix(in srgb,var(--hc) 55%,transparent)}
+.starter-name{font-family:var(--head);font-size:.95rem}
+.starter-actions{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.btn-sm{padding:6px 12px;font-size:.8rem;min-height:0}
+.join-note{margin-top:var(--s-4)}
+/* sealed howls: fully blurred, nothing readable */
+.howl.is-locked{position:relative;overflow:hidden}
+.howl-sealed{display:flex;gap:inherit;align-items:inherit;filter:blur(9px);opacity:.55;user-select:none;pointer-events:none}
