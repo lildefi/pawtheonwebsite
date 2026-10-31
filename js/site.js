@@ -212,11 +212,12 @@
     var p = new URLSearchParams(location.search);
     var i = findWizard(parseInt(p.get("dog"), 10));
     if (i < 0) i = 0;
+    var LORE_LOCKED = true; // each dog's lore stays saved in js/wizards.js; set false to show it again
     var w = WIZARDS[i], L = WIZARDS.length;
     var prev = WIZARDS[(i - 1 + L) % L], next = WIZARDS[(i + 1) % L];
     document.title = "Dog #" + w.number + (w.title ? " · " + w.title : "") + " · The Order of 86";
     var md = document.querySelector('meta[name="description"]');
-    if (md && w.lore) md.setAttribute("content", (w.title ? w.title + ": " : "") + w.lore.split(/\n/)[0].replace(/\*/g, "").slice(0, 150));
+    if (md && w.lore && !LORE_LOCKED) md.setAttribute("content", (w.title ? w.title + ": " : "") + w.lore.split(/\n/)[0].replace(/\*/g, "").slice(0, 150));
     detail.style.setProperty("--bgc", bgColor(w));
     var tiles = w.traits.map(function (t) {
       return '<div class="trait"><dt>' + esc(t[0]) + "</dt><dd>" + esc(t[1]) + "</dd></div>";
@@ -243,9 +244,11 @@
             '<div><dt>Seat</dt><dd>' + (i + 1) + ' <small>/ ' + L + "</small></dd></div>" +
           "</dl>" +
           '<div class="holder-row"><span class="k">Current holder</span> ' + (holder(w) ? holderLink(holder(w), "holder-link holder-link-lg") : '<span class="muted">Holder not linked</span>') + "</div>" +
-          (w.summary ? '<p class="detail-summary">' + esc(w.summary) + "</p>" : "") +
           '<h2 class="h3">Biography</h2>' +
-          '<div class="detail-lore">' + (w.lore ? loreHtml(w.lore) : "<p>This wizard's story has not been written into the archive yet. When leadership adds it, it will appear here.</p>") + "</div>" +
+          (LORE_LOCKED
+            ? '<div class="lore-locked"><div class="lore-blur" aria-hidden="true">' + (w.summary ? '<p class="detail-summary">' + esc(w.summary) + "</p>" : "") + '<div class="detail-lore">' + (w.lore ? loreHtml(w.lore) : "<p>This wizard's story is still being written into the archive.</p>") + '</div></div><p class="lore-soon">Lore coming soon</p></div>'
+            : (w.summary ? '<p class="detail-summary">' + esc(w.summary) + "</p>" : "") +
+              '<div class="detail-lore">' + (w.lore ? loreHtml(w.lore) : "<p>This wizard's story has not been written into the archive yet. When leadership adds it, it will appear here.</p>") + "</div>") +
           '<h2 class="h3">Traits</h2><dl class="traits">' + tiles + "</dl>" +
           '<p class="muted small">Rarity rank is the Doginal Dogs market rank: 1 is the rarest of 10,000. The holder is the X account linked to this dog on market.doginaldogs.com' + (window.HOLDERS_UPDATED ? " (checked " + esc(window.HOLDERS_UPDATED) + ")" : "") + ".</p>" +
         "</div>" +
