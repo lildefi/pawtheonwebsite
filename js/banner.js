@@ -13,11 +13,11 @@
   var NAME_FONT = '"Banner Display", "Archivo Black", "Arial Black", Impact, sans-serif';
   var HANDLE_FONT = '"Banner Handle", "Arial Black", Arial, Helvetica, sans-serif';
 
-  // Wizard hats extracted from the 86 wizard dogs' pixel art (images/hats, 15x10 art pixels each), plus a white, black and red one made to match.
+  // Wizard hats extracted from the 86 wizard dogs' pixel art (images/hats, 15x10 art pixels each), plus the red, white and black hats the starter wizards wear.
   var HATS = [
     { id: "orange", label: "Orange" }, { id: "purple", label: "Purple" }, { id: "blue", label: "Blue" },
     { id: "green", label: "Green" }, { id: "pink", label: "Pink" }, { id: "yellow", label: "Yellow" },
-    { id: "white", label: "White & Red" }   // custom white, black and red hat in the same pixel style
+    { id: "red", label: "Red" }, { id: "white", label: "White" }, { id: "black", label: "Black" }   // starter wizards' hats
   ];
   // Doginal Dogs Background trait values (market.doginaldogs.com), colours sampled from the dog art.
   var BACKGROUNDS = [
