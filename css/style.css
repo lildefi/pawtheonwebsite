@@ -178,7 +178,7 @@ select option,select optgroup{background:var(--night-2);color:var(--text)}
 
 /* ---------- Sections ---------- */
 .section{padding-top:var(--s-8)}
-.flourish{height:27px;max-width:483px;margin:var(--s-8) auto 0;background:var(--px-div-night) center/483px 27px no-repeat}
+.flourish{height:35px;max-width:483px;margin:var(--s-8) auto 0;background:var(--px-div-night) center/483px 35px no-repeat}
 .flourish+.section{padding-top:var(--s-6)}
 .section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--s-5);flex-wrap:wrap;margin-bottom:var(--s-6)}
 .section-head .muted{margin:var(--s-3) 0 0;max-width:62ch}
@@ -355,7 +355,7 @@ select option,select optgroup{background:var(--night-2);color:var(--text)}
 .howl-story a:not(.btn){color:var(--ink-red)}
 .howl-story h3{font-size:clamp(1.45rem,3vw,1.8rem);margin:var(--s-5) 0 var(--s-3);color:#3b2457}
 .howl-source{color:var(--ink-2)!important}
-.howl-rule{border:0;height:27px;max-width:483px;margin:var(--s-6) auto;background:url("../images/divider-moons-ink.png") center/483px 27px no-repeat}
+.howl-rule{border:0;height:35px;max-width:483px;margin:var(--s-6) auto;background:url("../images/divider-moons-ink.png") center/483px 35px no-repeat}
 .howl-fig{margin:var(--s-5) 4px var(--s-5);padding:0;background:var(--ink);box-shadow:0 0 0 4px var(--ink),0 0 0 8px var(--tan),0 0 0 12px var(--ink)}
 .howl-fig img{width:100%;max-width:100%;height:auto;image-rendering:auto}
 .howl-cover{margin:var(--s-2) 4px var(--s-6)}
@@ -398,7 +398,7 @@ select option,select optgroup{background:var(--night-2);color:var(--text)}
 .trait{padding:10px 14px}
 .trait dt{font:400 13px/1.3 var(--display);color:var(--muted)}
 .trait dd{margin:4px 0 0;font:700 1.12rem/1.2 var(--head);color:var(--text)}
-.prevnext{display:grid;grid-template-columns:1fr auto 1fr;gap:var(--s-5);align-items:center;margin-top:var(--s-7);padding-top:var(--s-7);background:var(--px-div-night) center 0/483px 27px no-repeat}
+.prevnext{display:grid;grid-template-columns:1fr auto 1fr;gap:var(--s-5);align-items:center;margin-top:var(--s-7);padding-top:var(--s-7);background:var(--px-div-night) center 0/483px 35px no-repeat}
 .pn{display:flex;align-items:center;gap:12px;padding:10px;color:var(--text);text-decoration:none}
 .pn:hover{--f:var(--tan);color:var(--text)}
 .pn img{width:56px;height:56px;background:var(--bgc);box-shadow:0 0 0 3px var(--ink-0)}
@@ -481,7 +481,7 @@ select option,select optgroup{background:var(--night-2);color:var(--text)}
 @media (max-width:520px){.banner-actions .btn{width:calc(100% - 6px)}.banner-actions .small{width:100%;text-align:center}.ctl-group{padding:var(--s-4)}}
 
 /* ---------- Footer ---------- */
-.site-footer{margin-top:var(--s-9);padding-top:var(--s-5);background:var(--px-div-night) center 0/483px 27px no-repeat}
+.site-footer{margin-top:var(--s-9);padding-top:var(--s-5);background:var(--px-div-night) center 0/483px 35px no-repeat}
 .footer-inner{display:flex;align-items:center;justify-content:space-between;gap:var(--s-5);flex-wrap:wrap;padding-top:var(--s-6);padding-bottom:var(--s-7)}
 .footer-inner p{margin:0;color:var(--muted)}
 @media (max-width:720px){.footer-inner{flex-direction:column;align-items:flex-start}}
@@ -558,7 +558,7 @@ select option,select optgroup{background:var(--night-2);color:var(--text)}
   .js .reveal{transition:opacity .3s steps(2,end)}
 }
 /* phones: the narrower moon divider */
-@media (max-width:520px){.flourish,.site-footer,.prevnext{background-image:url("../images/divider-moons-sm.png");background-size:354px 27px}.flourish{max-width:354px}}
+@media (max-width:520px){.flourish,.site-footer,.prevnext{background-image:url("../images/divider-moons-sm.png");background-size:354px 26px}.flourish{max-width:354px}}
 
 /* banner page: centred text, headings, labels and controls (desktop and phones) */
 .page-banner .page-hero{text-align:center}.page-banner .page-hero .lead{margin-left:auto;margin-right:auto}.page-banner .banner-actions{justify-content:center;text-align:center}.page-banner .ctl-h{justify-content:center;text-align:center}.page-banner .ctl > label,.page-banner .ctl > legend,.page-banner .ctl > .ctl-lab{text-align:center}.page-banner .ctl input[type=text]{text-align:center}.page-banner .switch{width:fit-content;max-width:100%;margin-left:auto;margin-right:auto}
