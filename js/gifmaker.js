@@ -4,7 +4,7 @@
  * then the frames are encoded with js/gifenc.js. Nothing is uploaded. */
 (function () {
   "use strict";
-  var BASE = "gifs/", V = "14";
+  var BASE = "gifs/", V = "15";
   var $ = function (s, el) { return (el || document).querySelector(s); };
   var state = { dog: null, mode: "dog", index: [], dogs: {}, full: {}, scenes: {}, open: null, timer: 0, token: 0 };
 
