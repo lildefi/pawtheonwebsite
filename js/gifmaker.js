@@ -4,7 +4,7 @@
  * then the frames are encoded with js/gifenc.js. Nothing is uploaded. */
 (function () {
   "use strict";
-  var BASE = "gifs/", V = "17";
+  var BASE = "gifs/", V = "18";
   var $ = function (s, el) { return (el || document).querySelector(s); };
   var state = { dog: null, mode: "dog", index: [], dogs: {}, full: {}, scenes: {}, open: null, timer: 0, token: 0 };
 
@@ -81,8 +81,18 @@
     return (J._tm = { x: axis(J.w, J.xs), y: axis(J.h, J.ys) });
   }
   function firstAt(s, v) { var t = 0; while (t < TS && s[t] < v) t++; return t; }
+  /* kind 9: head cell on the neck join - the dog's own portrait pixel, except a bare outline pixel on the head's edge
+     (black next to portrait background) becomes the official body's role colour, so the neck/chest outline runs on */
+  function edgeCol(pal, roles, g, v, u, ro) {
+    var pi = g.charCodeAt(v * 25 + u) - 48; if (pi === 0) return null;
+    var c = pal[pi];
+    if (c[0] || c[1] || c[2]) return c;
+    var bg = function (vv, uu) { return vv >= 0 && vv < 25 && uu >= 0 && uu < 25 && g.charCodeAt(vv * 25 + uu) === 48; };
+    return (bg(v, u - 1) || bg(v, u + 1) || bg(v + 1, u)) ? roles[ro] : c;
+  }
   function opColor(dog, pal, roles, g, ops, o) {
     var kind = ops[o + 2];
+    if (kind === 9) return edgeCol(pal, roles, g, ops[o + 3], ops[o + 4], ops[o + 5]);
     if (kind === 2) return roles[ops[o + 5]];
     if (kind >= 5 && kind <= 6) return texCol(dog, pal, roles, kind, ops[o + 3], ops[o + 4], ops[o + 5]);
     var pi = g.charCodeAt(ops[o + 3] * 25 + ops[o + 4]) - 48;
@@ -169,6 +179,7 @@
         continue;
       }
       if (kind === 2) col = roles[ops[o + 5]];
+      else if (kind === 9) { col = edgeCol(pal, roles, g, ops[o + 3], ops[o + 4], ops[o + 5]); if (!col) continue; }
       else if (kind === 7) {
         // scene prop in the dog's own hat colour (copy of portrait cell v,u), e.g. the broom's bristles
         var hi = g.charCodeAt(ops[o + 3] * 25 + ops[o + 4]) - 48;
