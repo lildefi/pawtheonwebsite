@@ -26,9 +26,11 @@
     { id: "Rose", color: "#ffb1dd" }, { id: "Tan", color: "#f8e49e" }, { id: "Yellow", color: "#ffe154" }
   ];
 
+  var HAT_SCALE = 1.45;   // hat size vs the first version (1 = 8/104 of the cap height per art pixel)
   var L = {            // proportions, all multiplied by the cap height C
     capMax: 80, blockMidY: 250, halfSafe: 430, handleHalfSafe: 330, lineStep: 1.38, blockMaxH: 240, nameScaleX: 1.12, nameTrack: -7 / 104,
-    hatPx: 8 / 104, hatDX: 23 / 104, hatDY: -21 / 104, hatAngle: -18 * Math.PI / 180, hatHalfBox: 70 / 104,
+    hatScale: HAT_SCALE, hatPx: 8 * HAT_SCALE / 104, hatAngle: -18 * Math.PI / 180, hatHalfBox: 70 * HAT_SCALE / 104,
+    hatDX: (35.4 - 12.4 * HAT_SCALE) / 104, hatDY: (17 - 38 * HAT_SCALE) / 104, hatTop: (94.6 * HAT_SCALE - 17) / 104,   // hat grown about its brim-bottom centre, so it stays perched on the first letter
     badgeD: 74 / 104, badgeGap: 20 / 104, badgeDY: -23 / 104,
     handleSize: 36.7 / 104, handleGap: 15 / 104
   };
@@ -106,7 +108,7 @@
   function plan(name, hatOn, badgeOn, hasHandle) {   // one line, or two lines split at a space when that makes the name clearly bigger
     var best = null, words = name.split(/\s+/), k;
     function heightCap(n, C0) {   // keep the block inside the Spaces strip (y 120-380 => 250px tall incl. hat, handle)
-      var f = (hatOn ? 0.75 : (badgeOn ? 0.58 : 0)) + 1 + (n - 1) * L.lineStep + (hasHandle ? L.handleGap + 0.72 * L.handleSize + 0.25 * L.handleSize : 0);
+      var f = (hatOn ? L.hatTop : (badgeOn ? 0.58 : 0)) + 1 + (n - 1) * L.lineStep + (hasHandle ? L.handleGap + 0.72 * L.handleSize + 0.25 * L.handleSize : 0);
       return Math.min(C0, L.blockMaxH / f);
     }
     var one = { lines: [name], C: heightCap(1, fitC(name, hatOn, badgeOn)) };
@@ -126,7 +128,7 @@
       var hatOn = !!(state.hat && hatPixels(state.hat)), badgeOn = badgeIn.checked;
       var pl = plan(name, hatOn, badgeOn, !!handle), C = pl.C, n = pl.lines.length;
       var hs = handle ? handleSizeFor(C) : 0, hAsc = hs * 0.72, hBlock = handle ? L.handleGap * C + hAsc + hs * 0.25 : 0;
-      var topOff = hatOn ? 0.75 * C : (badgeOn ? 0.58 * C : 0);   // block extent above the first cap top
+      var topOff = hatOn ? L.hatTop * C : (badgeOn ? 0.58 * C : 0);   // block extent above the first cap top
       var total = topOff + C + (n - 1) * L.lineStep * C + hBlock, blockTop = L.blockMidY - total / 2;
       pl.lines.forEach(function (line, li) {
         var g = layout(line, C, li === 0 && hatOn, li === n - 1 && badgeOn);
