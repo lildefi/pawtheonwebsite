@@ -19,8 +19,8 @@ SITE = pathlib.Path(__file__).resolve().parent.parent
 API = "https://market.doginaldogs.com/api/trpc/"
 HANDLE = re.compile(r"^[A-Za-z0-9_]{1,15}$")
 
-# Handles Defi confirmed by hand where the market has no linked X (dog number -> handle).
-OVERRIDES = {"1271": "SwitchMetaX", "4994": "SwitchMetaX", "5381": "SwitchMetaX", "6135": "SwitchMetaX", "6164": "SwitchMetaX", "6873": "SwitchMetaX", "7770": "SwitchMetaX", "8518": "SwitchMetaX", "9624": "SwitchMetaX"}
+# Handles Defi confirmed by hand (market link missing or out of date) (dog number -> handle).
+OVERRIDES = {"2426": "geezymeta", "7226": "geezymeta", "8284": "JawnChimpoMeta", "1271": "SwitchMetaX", "4994": "SwitchMetaX", "5381": "SwitchMetaX", "6135": "SwitchMetaX", "6164": "SwitchMetaX", "6873": "SwitchMetaX", "7770": "SwitchMetaX", "8518": "SwitchMetaX", "9624": "SwitchMetaX"}
 
 
 def trpc(proc, inp, tries=3):

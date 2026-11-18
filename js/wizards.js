@@ -96,6 +96,10 @@ window.WIZARDS = [
     {"number": 3186, "name": null, "image": "images/dogs/3186.png", "traits": [["Background", "Tan"], ["Fur Color", "Brown"], ["Fur Pattern", "Classic"], ["Head", "Wizard"], ["Eyes", "Black"]], "rank": 9281, "title": "Brownheart the Common Light", "order": "Radiant", "realm": "Violet Highlands", "lore": "The least rare Wizard in the entire Order of 86, ranking 9,281 out of 10,000, more common than 92.8% of all Doginal Dogs. Yet Brownheart practices the magic of absolute truth and divine light. Their brown Classic fur is completely ordinary, their black eyes provide simple focus, and they wear no distinctive clothing or accessories. They are the most unremarkable-looking being practicing the most remarkable magic.\n\nTheir power lies not in spectacular displays but in Simple Truth, basic, honest light that reveals reality without interpretation or complication. Brownheart's magic doesn't blind or overwhelm; it simply shows things as they actually are. Their ordinary appearance makes them approachable to common dogs who would be intimidated by more dramatic Radiant Wizards. They serve as the Order's connection to everyday truth-telling, proving that the most important light isn't the brightest, it's the most reliable. When other Radiant magic fails, Brownheart's simple illumination still works."}
 ];
 
+/* Names stay hidden as "????" until the holder fills out the lore form and Defi approves it.
+ * The saved title is kept in savedTitle. */
+WIZARDS.forEach(function (w) { if (!w.loreApproved && w.title) { w.savedTitle = w.title; w.title = "????"; } });
+
 window.wizardName = function (w) { return w.title || w.name || ("Dog #" + w.number); };
 window.findWizard = function (n) {
   for (var i = 0; i < WIZARDS.length; i++) if (WIZARDS[i].number === n) return i;

@@ -19,7 +19,7 @@ window.HOLDERS = {
 "5035": "GraveMetaX",
 "6398": null,
 "9530": "liz3thJ",
-"2426": null,
+"2426": "geezymeta",
 "9396": null,
 "5381": "SwitchMetaX",
 "1977": "PawsMeta",
@@ -51,7 +51,7 @@ window.HOLDERS = {
 "8095": null,
 "4994": "SwitchMetaX",
 "8342": null,
-"8284": null,
+"8284": "JawnChimpoMeta",
 "6203": "JagOBX",
 "9826": "BooMetaX",
 "4742": "HanzometaX",
@@ -87,6 +87,6 @@ window.HOLDERS = {
 "1841": "funkchan",
 "9713": "Swishmeta",
 "3417": null,
-"7226": null,
+"7226": "geezymeta",
 "3186": null
 };
