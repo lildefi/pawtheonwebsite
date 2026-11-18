@@ -19,6 +19,9 @@ SITE = pathlib.Path(__file__).resolve().parent.parent
 API = "https://market.doginaldogs.com/api/trpc/"
 HANDLE = re.compile(r"^[A-Za-z0-9_]{1,15}$")
 
+# Handles Defi confirmed by hand where the market has no linked X (dog number -> handle).
+OVERRIDES = {"1271": "SwitchMetaX", "4994": "SwitchMetaX", "5381": "SwitchMetaX", "6135": "SwitchMetaX", "6164": "SwitchMetaX", "6873": "SwitchMetaX", "7770": "SwitchMetaX", "8518": "SwitchMetaX", "9624": "SwitchMetaX"}
+
 
 def trpc(proc, inp, tries=3):
     url = API + proc + "?input=" + urllib.parse.quote(json.dumps({"json": inp}))
@@ -64,7 +67,7 @@ def main():
         except Exception as e:
             h, why = None, str(e)
             problems.append((num, why))
-        out[str(num)] = h
+        out[str(num)] = OVERRIDES.get(str(num), h)
         print("#%-5d %s" % (num, "@" + h if h else "- (" + why + ")"))
         time.sleep(0.3)
     if len(problems) > len(nums) // 4:
