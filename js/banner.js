@@ -27,7 +27,7 @@
   ];
 
   var L = {            // proportions, all multiplied by the cap height C
-    capMax: 104, capMidY: 260, safeW: 1000, nameScaleX: 1.12, nameTrack: -7 / 104,
+    capMax: 80, blockMidY: 250, halfSafe: 430, handleHalfSafe: 330, lineStep: 1.38, blockMaxH: 240, nameScaleX: 1.12, nameTrack: -7 / 104,
     hatPx: 8 / 104, hatDX: 23 / 104, hatDY: -21 / 104, hatAngle: -18 * Math.PI / 180, hatHalfBox: 70 / 104,
     badgeD: 74 / 104, badgeGap: 20 / 104, badgeDY: -23 / 104,
     handleSize: 36.7 / 104, handleGap: 15 / 104
@@ -77,51 +77,85 @@
     ctx.font = "900 " + size + "px " + NAME_FONT;
     if ("letterSpacing" in ctx) ctx.letterSpacing = (L.nameTrack * C / L.nameScaleX).toFixed(2) + "px";
   }
-  function layout(name, C) {
+  function layout(name, C, hatOn, badgeOn) {
     // Returns geometry for a given cap height C.
     var probe = 100; ctx.font = "900 " + probe + "px " + NAME_FONT; if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
     var capRatio = ctx.measureText("H").actualBoundingBoxAscent / probe || 0.72;
     var size = C / capRatio; setNameFont(size, C);
     var m = ctx.measureText(name), sx = L.nameScaleX;
     var inkL = -m.actualBoundingBoxLeft * sx, inkR = m.actualBoundingBoxRight * sx;   // relative to draw x, after the horizontal stretch
-    var hatOn = !!state.hat, badgeOn = badgeIn.checked;
     var hatCx = inkL + L.hatDX * C, left = hatOn ? Math.min(inkL, hatCx - L.hatHalfBox * C) : inkL;
     var badgeCx = inkR + L.badgeGap * C + L.badgeD * C / 2, right = badgeOn ? badgeCx + L.badgeD * C / 2 : inkR;
-    return { size: size, C: C, left: left, right: right, width: right - left, hatCx: hatCx, badgeCx: badgeCx };
+    return { size: size, C: C, inkL: inkL, inkR: inkR, left: left, right: right, width: right - left, hatCx: hatCx, badgeCx: badgeCx };
   }
 
+  // Layout for the cropped views (X Spaces popup shows a ~5.3:1 strip, y 120-380 of the banner, with the round avatar over the
+  // bottom-left; the profile page puts the avatar over x 20-400, y 310-500). So: everything is centred on x=750, the whole block
+  // (hat, name, badge, handle) is centred on y=250 and stays inside y 120-380, and nothing reaches further than halfSafe from the
+  // centre line, which keeps it clear of both avatars.
+  function handleSizeFor(C) { return Math.max(L.handleSize * C, 22); }
+  function fitC(line, hatOn, badgeOn) {   // largest cap height (<= capMax) at which hat + line + badge fit the safe half-width
+    var C = L.capMax, g = layout(line, C, hatOn, badgeOn), i, need, mid;
+    for (i = 0; i < 4; i++) {
+      mid = (g.inkL + g.inkR) / 2; need = Math.max(mid - g.left, g.right - mid);
+      if (need <= L.halfSafe) break;
+      C = C * L.halfSafe / need * 0.995; g = layout(line, C, hatOn, badgeOn);
+    }
+    return C;
+  }
+  function plan(name, hatOn, badgeOn, hasHandle) {   // one line, or two lines split at a space when that makes the name clearly bigger
+    var best = null, words = name.split(/\s+/), k;
+    function heightCap(n, C0) {   // keep the block inside the Spaces strip (y 120-380 => 250px tall incl. hat, handle)
+      var f = (hatOn ? 0.75 : (badgeOn ? 0.58 : 0)) + 1 + (n - 1) * L.lineStep + (hasHandle ? L.handleGap + 0.72 * L.handleSize + 0.25 * L.handleSize : 0);
+      return Math.min(C0, L.blockMaxH / f);
+    }
+    var one = { lines: [name], C: heightCap(1, fitC(name, hatOn, badgeOn)) };
+    best = one;
+    for (k = 1; k < words.length; k++) {
+      var l1 = words.slice(0, k).join(" "), l2 = words.slice(k).join(" ");
+      var C = heightCap(2, Math.min(fitC(l1, hatOn, false), fitC(l2, false, badgeOn)));
+      if (C > one.C * 1.25 && (best === one || C > best.C)) best = { lines: [l1, l2], C: C };
+    }
+    return best;
+  }
   function draw() {
-    var name = (nameIn.value || "").trim().toUpperCase(), handle = handleText();
+    var name = (nameIn.value || "").trim().replace(/\s+/g, " ").toUpperCase(), handle = handleText(), CX = W / 2;
     ctx.save();
     ctx.fillStyle = state.bg; ctx.fillRect(0, 0, W, H);
     if (name) {
-      var g = layout(name, L.capMax);
-      if (g.width > L.safeW) g = layout(name, L.capMax * L.safeW / g.width);   // auto-shrink long names
-      var C = g.C, x = W / 2 - (g.left + g.right) / 2, capTop = L.capMidY - C / 2, base = L.capMidY + C / 2;
-      setNameFont(g.size, C); ctx.textAlign = "left"; ctx.textBaseline = "alphabetic"; ctx.fillStyle = state.ink;
-      ctx.save(); ctx.translate(x, base); ctx.scale(L.nameScaleX, 1); ctx.fillText(name, 0, 0); ctx.restore();
-      if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
-      var px = state.hat && hatPixels(state.hat);
-      if (px) {
-        // One filled square per art pixel inside the rotated frame: stays crisp at any size and angle.
-        var p = L.hatPx * C, hw = px.w * p, hh = px.h * p;
-        ctx.save(); ctx.translate(x + g.hatCx, capTop + L.hatDY * C); ctx.rotate(L.hatAngle); ctx.translate(-hw / 2, -hh / 2);
-        ctx.imageSmoothingEnabled = false;
-        px.list.forEach(function (q) { ctx.fillStyle = q[2]; ctx.fillRect(q[0] * p - 0.35, q[1] * p - 0.35, p + 0.7, p + 0.7); });
-        ctx.restore();
-      }
-      if (badgeIn.checked) drawBadge(x + g.badgeCx, capTop + L.badgeDY * C, L.badgeD * C);
-      var handleTop = base + L.handleGap * C;
-      if (handle) drawHandle(handle, handleTop, Math.max(L.handleSize * C, 26));
+      var hatOn = !!(state.hat && hatPixels(state.hat)), badgeOn = badgeIn.checked;
+      var pl = plan(name, hatOn, badgeOn, !!handle), C = pl.C, n = pl.lines.length;
+      var hs = handle ? handleSizeFor(C) : 0, hAsc = hs * 0.72, hBlock = handle ? L.handleGap * C + hAsc + hs * 0.25 : 0;
+      var topOff = hatOn ? 0.75 * C : (badgeOn ? 0.58 * C : 0);   // block extent above the first cap top
+      var total = topOff + C + (n - 1) * L.lineStep * C + hBlock, blockTop = L.blockMidY - total / 2;
+      pl.lines.forEach(function (line, li) {
+        var g = layout(line, C, li === 0 && hatOn, li === n - 1 && badgeOn);
+        var x = CX - (g.inkL + g.inkR) / 2;                       // each line's ink is centred on the banner
+        var capTop = blockTop + topOff + li * L.lineStep * C, base = capTop + C;
+        setNameFont(g.size, C); ctx.textAlign = "left"; ctx.textBaseline = "alphabetic"; ctx.fillStyle = state.ink;
+        ctx.save(); ctx.translate(x, base); ctx.scale(L.nameScaleX, 1); ctx.fillText(line, 0, 0); ctx.restore();
+        if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
+        if (li === 0 && hatOn) {
+          var px = hatPixels(state.hat);
+          // One filled square per art pixel inside the rotated frame: stays crisp at any size and angle.
+          var p = L.hatPx * C, hw = px.w * p, hh = px.h * p;
+          ctx.save(); ctx.translate(x + g.hatCx, capTop + L.hatDY * C); ctx.rotate(L.hatAngle); ctx.translate(-hw / 2, -hh / 2);
+          ctx.imageSmoothingEnabled = false;
+          px.list.forEach(function (q) { ctx.fillStyle = q[2]; ctx.fillRect(q[0] * p - 0.35, q[1] * p - 0.35, p + 0.7, p + 0.7); });
+          ctx.restore();
+        }
+        if (li === n - 1 && badgeOn) drawBadge(x + g.badgeCx, capTop + L.badgeDY * C, L.badgeD * C);
+        if (li === n - 1 && handle) drawHandle(handle, base + L.handleGap * C, hs);
+      });
     } else if (handle) {
-      drawHandle(handle, L.capMidY - 20, L.handleSize * L.capMax * 1.4);
+      drawHandle(handle, L.blockMidY - 0.36 * L.capMax * 0.8, L.handleSize * L.capMax * 1.4);
     }
     ctx.restore();
   }
   function drawHandle(text, top, size) {
     ctx.font = "800 " + size + "px " + HANDLE_FONT;
     var asc = ctx.measureText("l").actualBoundingBoxAscent || size * 0.72;
-    while (ctx.measureText(text).width > L.safeW && size > 12) { size -= 1; ctx.font = "800 " + size + "px " + HANDLE_FONT; }
+    while (ctx.measureText(text).width > L.handleHalfSafe * 2 && size > 12) { size -= 1; ctx.font = "800 " + size + "px " + HANDLE_FONT; }
     ctx.textAlign = "center"; ctx.textBaseline = "alphabetic"; ctx.fillStyle = state.ink;
     ctx.fillText(text, W / 2, top + asc);
   }
