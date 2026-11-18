@@ -718,5 +718,85 @@
 "h": 1080,
 "np": 5,
 "ms": 1300
+},
+{
+"id": "sailor",
+"title": "Sailor",
+"library": "sailor",
+"nf": 10,
+"w": 1080,
+"h": 1080,
+"np": 9,
+"ms": 1000
+},
+{
+"id": "satayin",
+"title": "Cloud rider",
+"library": "satayin",
+"nf": 11,
+"w": 1080,
+"h": 1080,
+"np": 11,
+"ms": 1100
+},
+{
+"id": "phone-pfp",
+"title": "Phone PFP",
+"library": "Phone-pfp",
+"nf": 10,
+"w": 1080,
+"h": 1080,
+"np": 6,
+"ms": 1000
+},
+{
+"id": "open-laptop",
+"title": "Open laptop",
+"library": "Open-laptop",
+"nf": 16,
+"w": 1080,
+"h": 1080,
+"np": 16,
+"ms": 1600
+},
+{
+"id": "dogs-dont-sell",
+"title": "Dogs don't sell",
+"library": "dogs-dont-sell",
+"nf": 16,
+"w": 1080,
+"h": 1080,
+"np": 10,
+"ms": 2600
+},
+{
+"id": "trench",
+"title": "Trench",
+"library": "trench",
+"nf": 32,
+"w": 1080,
+"h": 1080,
+"np": 9,
+"ms": 3200
+},
+{
+"id": "tacodog",
+"title": "Taco",
+"library": "tacodog",
+"nf": 18,
+"w": 1080,
+"h": 1080,
+"np": 1,
+"ms": 4000
+},
+{
+"id": "flower-field",
+"title": "Flower field",
+"library": "Flower-field",
+"nf": 16,
+"w": 1080,
+"h": 1080,
+"np": 12,
+"ms": 1600
 }
 ]
